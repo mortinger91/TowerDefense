@@ -7,12 +7,21 @@
 #include "TimerManager.h"
 #include "Components/TimelineComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Stats_HUD.h"
+// spostare in stats_hud
+#include "Components/TextBlock.h"
+#include "Game_UserWidget.h"
+
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
 	MaxHealth = 10;
 	HealthDamage = 0.0f;
 	MaxGold = 999;
+
+	InitiateGameOver = false;
+
+	MyTimeline = NewObject<UTimelineComponent>(this, FName("Health_Animation"));
 }
 
 // Called every frame
@@ -27,7 +36,9 @@ void ATower_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetCurrentState(EGamePlayState::EPlaying);
+	UE_LOG(LogActor, Warning, TEXT("Loaded Tower_GameMode"))
+
+	HandleNewState(EGamePlayState::EPlaying);
 
 	GS = Cast<ATower_GameState>(GetWorld()->GetGameState());
 	if (GS == nullptr)
@@ -39,6 +50,12 @@ void ATower_GameMode::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("HealthCurve not found!"))
 	}
 
+	HudWidgetPlayer = Cast<AStats_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (HudWidgetPlayer == nullptr)
+	{
+		UE_LOG(LogActor, Warning, TEXT("HUD Widget not found!"))
+	}
+
 	// setting health at the start of the game
 	GS->Health = MaxHealth;
 	PreviousHealth = GS->HealthPercentage;
@@ -46,7 +63,6 @@ void ATower_GameMode::BeginPlay()
 	// timeline and callback
     FOnTimelineFloat TimelineCallback;
     TimelineCallback.BindUFunction(this, FName("SetHealth"));
-	MyTimeline = NewObject<UTimelineComponent>(this, FName("Health_Animation"));
     MyTimeline->AddInterpFloat(HealthCurve, TimelineCallback);
 	MyTimeline->RegisterComponent();
 
@@ -63,14 +79,21 @@ void ATower_GameMode::Remove1Health()
 // called when MyTimeline->PlayFromStart() is called in Remove1Health()
 void ATower_GameMode::SetHealth()
 {
-	TimelineValue = MyTimeline->GetPlaybackPosition();
-    CurveFloatValue = PreviousHealth + HealthDamage*HealthCurve->GetFloatValue(TimelineValue);
-	GS->Health = UKismetMathLibrary::Round(CurveFloatValue*MaxHealth);
-	GS->HealthPercentage = CurveFloatValue;
-	// if health reaches 0, enter gameover state
-	if (GS->Health <= 0)
+	if (!InitiateGameOver)
 	{
-		SetCurrentState(EGamePlayState::EGameOver);
+		TimelineValue = MyTimeline->GetPlaybackPosition();
+		CurveFloatValue = PreviousHealth + HealthDamage*HealthCurve->GetFloatValue(TimelineValue);
+		GS->Health = UKismetMathLibrary::Round(CurveFloatValue*MaxHealth);
+
+		Cast<UTextBlock>(HudWidgetPlayer->GetHUDWidget()->GetWidgetFromName(FName("Health_Text")))->SetText(GS->GetHealthText());
+
+		GS->HealthPercentage = CurveFloatValue;
+		// if health reaches 0, enter gameover state
+		if (GS->Health <= 0)
+		{
+			MyTimeline->Stop();
+			HandleNewState(EGamePlayState::EGameOver);
+		}
 	}
 }
 
@@ -94,7 +117,7 @@ void ATower_GameMode::SetHealth()
 //}
 
 // add to the player golds, return updated amount
-int32 ATower_GameMode::AddGold(float gold)
+void ATower_GameMode::AddGold(float gold)
 {
 	if (GS->Gold < MaxGold)
 	{
@@ -107,7 +130,8 @@ int32 ATower_GameMode::AddGold(float gold)
 			GS->Gold = MaxGold;
 		}
 	}
-	return GS->Gold;
+	HudWidgetPlayer->UpdateGoldText(GS->Gold);
+	//return GS->Gold;
 
 }
 
@@ -123,20 +147,10 @@ FVector ATower_GameMode::GetEndPositions()
 	return EndPointPosition[0];
 }
 
-EGamePlayState ATower_GameMode::GetCurrentState() const
-{
-	return CurrentState;
-}
-
-void ATower_GameMode::SetCurrentState(EGamePlayState NewState)
-{
-	CurrentState = NewState;
-	HandleNewState(CurrentState);
-}
-
 void ATower_GameMode::HandleNewState(EGamePlayState NewState)
 {
-	switch (NewState)
+	CurrentState = NewState;
+	switch (CurrentState)
 	{
 		case EGamePlayState::EPlaying:
 		{
@@ -146,10 +160,21 @@ void ATower_GameMode::HandleNewState(EGamePlayState NewState)
 		// Unknown/default state
 		case EGamePlayState::EGameOver:
 		{
+			InitiateGameOver = true;
 			// restart the level
 			UE_LOG(LogActor, Warning, TEXT("WE FUCKING LOST!"))
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("WE FUCKING LOST!")));
-			UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("WE FUCKING LOST!")));
+			//UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+
+			HudWidgetPlayer->GameOverMode();
+
+			FTimerDelegate TimerDel;
+			FTimerHandle TimerHandle;
+ 
+			//Binding the function to the timeline
+			TimerDel.BindUFunction(this, FName("GoToMainMenu"));
+			//Calling GoToMainMenu after 3 seconds without looping
+			GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 3.f, false);
 		}
 		break;
 		// Unknown/default state
@@ -160,4 +185,9 @@ void ATower_GameMode::HandleNewState(EGamePlayState NewState)
 		}
 		break;
 	}
+}
+
+void ATower_GameMode::GoToMainMenu()
+{
+	UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Tower_Defense/Levels/StartMenuLevel")));
 }

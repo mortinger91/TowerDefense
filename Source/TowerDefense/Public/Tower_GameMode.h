@@ -53,19 +53,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gold")
 	int32 MaxGold;
 
-	int32 AddGold(float gold);
+	void AddGold(float gold);
 
 	// end positions
 	void AddToEndPositions(const FVector& fv);
 
 	FVector GetEndPositions();
 
-	// Returns the current playing state
-	UFUNCTION(BlueprintPure, Category = "Game State")
-	EGamePlayState GetCurrentState() const;
+	//// Returns the current playing state
+	//UFUNCTION(BlueprintPure, Category = "Game State")
+	//EGamePlayState GetCurrentState() const;
 
-	// Sets a new playing state
-	void SetCurrentState(EGamePlayState NewState);
+	//// Sets a new playing state
+	//void SetCurrentState(EGamePlayState NewState);
 
 private:
 	std::vector<FVector> EndPointPosition;
@@ -77,5 +77,13 @@ private:
 
 	// Handle any function calls that rely upon changing the playing state of our game
 	void HandleNewState(EGamePlayState NewState);
+
+	UFUNCTION()
+	void GoToMainMenu();
+
+	bool InitiateGameOver;
+
+	// player hud, update gold count when enemy dies
+	class AStats_HUD * HudWidgetPlayer;
 
 };

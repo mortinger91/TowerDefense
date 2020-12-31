@@ -21,15 +21,28 @@ public:
 
 	virtual void DrawHUD() override;
 
-	UUserWidget * GetHUDWidget();
+	class UGame_UserWidget * GetHUDWidget();
 
 	void UpdateGoldText(int32 NewGoldCount);
 
+	//void UpdateHealthText(int32 NewHealth);
+
+	void GameOverMode();
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	//class UWidgetAnimation* GameOverAnimation;
+
 private:
-	UPROPERTY(EditAnywhere, Category = "Stats")
-	TSubclassOf<class UUserWidget> HUDWidgetClass;
+	//UPROPERTY(EditAnywhere, Category = "Stats")
+	//TSubclassOf<class UUserWidget> HUDWidgetClass;
+
+	//UPROPERTY(EditAnywhere, Category = "Stats")
+	//class UUserWidget * CurrentWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
-	class UUserWidget * CurrentWidget;
+	TSubclassOf<class UGame_UserWidget> HUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category = "Stats")
+	class UGame_UserWidget * CurrentWidget;
 
 };

@@ -8,7 +8,6 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
-#include "Stats_HUD.h"
 
 
 // Sets default values
@@ -53,11 +52,11 @@ void AEnemy::BeginPlay()
 	
 	Cast<UProgressBar>(HealthWidgetEnemy->GetWidgetFromName(FName("Health_Bar")))->SetPercent(1.f);
 
-	HudWidgetPlayer = Cast<AStats_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if (HudWidgetPlayer == nullptr)
-	{
-		UE_LOG(LogActor, Warning, TEXT("In Enemy: HUD Widget not found!"))
-	}
+	//HudWidgetPlayer = Cast<AStats_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	//if (HudWidgetPlayer == nullptr)
+	//{
+	//	UE_LOG(LogActor, Warning, TEXT("In Enemy: HUD Widget not found!"))
+	//}
 
 	ai = Cast<AAIController>(GetController());
 	if (ai == nullptr)
@@ -94,7 +93,7 @@ void AEnemy::GetDamaged(float damage)
 
 	if (health <= 0)
 	{
-		HudWidgetPlayer->UpdateGoldText(GM->AddGold(gold));
+		GM->AddGold(gold);
 
 		Destroy();
 
@@ -115,10 +114,4 @@ void AEnemy::GetDamaged(float damage)
 		//}
 	}
 }
-
-//float AEnemy::GetHealth()
-//{
-//	return health;
-//}
-
 

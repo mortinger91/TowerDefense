@@ -12,6 +12,18 @@ void AMainMenu_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogActor, Warning, TEXT("Loaded MainMenu_GameMode"))
+	
+	PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		FInputModeGameAndUI data;
+		data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+		PC->SetInputMode(data);
+		PC->bShowMouseCursor = true; 
+		PC->bEnableClickEvents = true; 
+		PC->bEnableMouseOverEvents = true;
+	}
 }
 
 // Called every frame

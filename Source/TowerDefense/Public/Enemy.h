@@ -22,8 +22,6 @@ public:
 
 	void GetDamaged(float damage);
 
-	//UFUNCTION(BlueprintPure, Category = "Stats")
-	//float GetHealth();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,9 +42,6 @@ protected:
 
 	// own health bar
 	UUserWidget * HealthWidgetEnemy;
-
-	// player hud, update gold count when enemy dies
-	class AStats_HUD * HudWidgetPlayer;
 
 	class AAIController* ai;
 

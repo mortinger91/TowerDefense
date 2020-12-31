@@ -29,4 +29,25 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
 	class UUserWidget * CurrentWidget;
+
+	UFUNCTION()
+	void StartGame();
+
+	UFUNCTION()
+	void QuitGame();
+
+	UFUNCTION()
+	void OpenOptions();
+
+	UFUNCTION()
+	void SetRes1080();
+
+	UFUNCTION()
+	void SetRes720();
+
+	UFUNCTION()
+	void SetRes480();
+
+	UFUNCTION()
+	void ReturnToMainMenu();
 };
