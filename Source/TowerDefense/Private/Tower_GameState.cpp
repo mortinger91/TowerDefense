@@ -3,6 +3,7 @@
 
 #include "Tower_GameState.h"
 #include "Tower_GameMode.h"
+#include "Engine/World.h"
 
 ATower_GameState::ATower_GameState()
 {

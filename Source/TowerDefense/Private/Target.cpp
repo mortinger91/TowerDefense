@@ -2,6 +2,8 @@
 
 
 #include "Target.h"
+#include "Engine/World.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 ATarget::ATarget()

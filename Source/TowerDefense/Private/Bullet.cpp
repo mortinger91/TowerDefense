@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#pragma optimize("", off)
+//#pragma optimize("", off)
 
 #include "Bullet.h"
 #include "GameFramework/ProjectileMovementComponent.h"

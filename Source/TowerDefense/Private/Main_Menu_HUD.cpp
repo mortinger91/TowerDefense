@@ -2,18 +2,18 @@
 
 
 #include "Main_Menu_HUD.h"
-#include "Blueprint/UserWidget.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
+#include "UObject/ConstructorHelpers.h"
 
 AMain_Menu_HUD::AMain_Menu_HUD()
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/Main_Menu_UI"));
 	HUDWidgetClass = HealthBarObj.Class;
-	
-	
+
 }
 
 void AMain_Menu_HUD::BeginPlay()

@@ -21,7 +21,7 @@ public:
 
 	virtual void DrawHUD() override;
 
-	UUserWidget * GetHUDWidget();
+	class UUserWidget * GetHUDWidget();
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Stats")

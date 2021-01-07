@@ -3,6 +3,7 @@
 
 #include "Tower.h"
 #include "Cooldown.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 ATower::ATower()

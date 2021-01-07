@@ -4,6 +4,7 @@
 #include "SpawnPoint.h"
 #include "Enemy.h"
 #include "Cooldown.h"
+//#include "Tower_GameMode.h"
 
 // Sets default values
 ASpawnPoint::ASpawnPoint()
@@ -11,15 +12,14 @@ ASpawnPoint::ASpawnPoint()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	SpawnMesh = CreateDefaultSubobject<UStaticMeshComponent>("SpawnMesh");
+	//SpawnMesh = CreateDefaultSubobject<UStaticMeshComponent>("SpawnMesh");
 	
-	SetRootComponent(SpawnMesh);
+	//SetRootComponent(SpawnMesh);
 	
 	cooldown = CreateDefaultSubobject<UCooldown>("cooldown");
 
-	//countTicks = 0;
-
 	cooldown->maxCooldown = 1.f;
+
 }
 
 // Called when the game starts or when spawned
@@ -27,47 +27,29 @@ void ASpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//SpawnEnemy("soldier");
+	//GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
+	//if (GM == nullptr)
+	//{
+	//	UE_LOG(LogActor, Warning, TEXT("In SpawnPoint: Game Mode not found!"))
+	//}
+
 }
-
-//inline bool ASpawnPoint::IsNotCooldown()
-//{
-//	if ((GetWorld()->GetRealTimeSeconds() - actualCooldown) > maxCooldown)
-//	{
-//		return true;
-//	}
-//	else
-//	{
-//		return false;
-//	}
-//}
-//
-//inline void ASpawnPoint::StartCooldown()
-//{
-//	actualCooldown = GetWorld()->GetRealTimeSeconds();
-//}
-
-
 
 // Called every frame
 void ASpawnPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	//if (countTicks++ % 10 == 0)
-	//{
-	//	countTicks = 0;
-		if (cooldown->IsNotCooldown())
-		{
-			cooldown->StartCooldown();
-			SpawnEnemy("soldier");
-		}
-	//}
+	//FVector temp;
+	//if (GM->GetEndPositions(temp) && cooldown->IsNotCooldown())
+	if (cooldown->IsNotCooldown())
+	{
+		cooldown->StartCooldown();
+		SpawnEnemy("soldier");
+	}
 }
 
-
-
-void ASpawnPoint::SpawnEnemy(std::string enemyType)
+void ASpawnPoint::SpawnEnemy(FString enemyType)
 {
 	// sparare di fatto è spawnare l'actor "bullet", che ha gia una speed che gli viene applicata quando viene creato, dato che ha un component di tipo "UProjectileMovementComponent"
 

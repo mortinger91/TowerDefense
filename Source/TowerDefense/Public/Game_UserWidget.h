@@ -16,9 +16,6 @@ class TOWERDEFENSE_API UGame_UserWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-	//class UWidgetAnimation* GameOverAnimation;
-
 	UWidgetAnimation* GetAnimationByName(FName AnimationName);
 
 	//bool PlayAnimationByName(FName AnimationName, float StartAtTime, int32 NumLoopsToPlay, EUMGSequencePlayMode::Type PlayMode, float PlaybackSpeed);

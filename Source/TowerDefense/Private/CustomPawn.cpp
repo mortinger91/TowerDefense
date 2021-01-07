@@ -9,7 +9,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
-
 // Sets default values
 ACustomPawn::ACustomPawn()
 {

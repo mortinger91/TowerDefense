@@ -49,7 +49,7 @@ public:
 
 	void Remove1Health();
 
-	// gold
+	// max gold
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gold")
 	int32 MaxGold;
 
@@ -58,25 +58,18 @@ public:
 	// end positions
 	void AddToEndPositions(const FVector& fv);
 
-	FVector GetEndPositions();
+	bool GetEndPositions(FVector &returnVector);
 
-	//// Returns the current playing state
-	//UFUNCTION(BlueprintPure, Category = "Game State")
-	//EGamePlayState GetCurrentState() const;
-
-	//// Sets a new playing state
-	//void SetCurrentState(EGamePlayState NewState);
+	// Handle any function calls that rely upon changing the playing state of our game
+	void ChangeGamePlayState(EGamePlayState NewState);
 
 private:
-	std::vector<FVector> EndPointPosition;
+	TArray<FVector> EndPointPosition;
 
 	class ATower_GameState* GS;
 	
 	// Keeps track of the current playing state
 	EGamePlayState CurrentState;
-
-	// Handle any function calls that rely upon changing the playing state of our game
-	void HandleNewState(EGamePlayState NewState);
 
 	UFUNCTION()
 	void GoToMainMenu();

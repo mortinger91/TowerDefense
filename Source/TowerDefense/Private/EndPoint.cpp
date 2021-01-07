@@ -4,6 +4,7 @@
 #include "EndPoint.h"
 #include "Tower_GameMode.h"
 #include "Enemy.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AEndPoint::AEndPoint()
@@ -26,7 +27,7 @@ void AEndPoint::BeginPlay()
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
 	{
-		UE_LOG(LogActor, Warning, TEXT("No Game Mode found for %s!"), *this->GetName())
+		UE_LOG(LogActor, Warning, TEXT("In EndPoint: Game Mode not found!"))
 	}
 
 	SetEndPointPosition();

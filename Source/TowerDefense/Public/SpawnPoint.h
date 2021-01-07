@@ -15,8 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	ASpawnPoint();
 
-	UPROPERTY(EditAnywhere, Category = "components")
-	UStaticMeshComponent* SpawnMesh;
+	//UPROPERTY(EditAnywhere, Category = "components")
+	//UStaticMeshComponent* SpawnMesh;
 
 	UPROPERTY(EditAnywhere, Category = "cooldown")
 	class UCooldown* cooldown;
@@ -24,10 +24,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SpawnEnemy(std::string enemyType);
-
-	//UPROPERTY(EditAnywhere, Category = "Cooldown")
-	//float maxCooldown;
+	void SpawnEnemy(FString enemyType);
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,13 +33,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnemySpawn")
 	TSubclassOf<class AEnemy> EnemyClass;
 
-	//uint32 countTicks;
-
-//	inline bool IsNotCooldown();
-//
-//	inline void StartCooldown();
-//
-//private:
-//	float actualCooldown;
+	//class ATower_GameMode * GM;
 
 };

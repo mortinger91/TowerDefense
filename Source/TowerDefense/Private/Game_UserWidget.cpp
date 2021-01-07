@@ -54,7 +54,6 @@ UWidgetAnimation* UGame_UserWidget::GetAnimationByName(FName AnimationName)
 	return nullptr;
 }
 
-
 //bool UGame_UserWidget::PlayAnimationByName(FName AnimationName, float StartAtTime, int32 NumLoopsToPlay, EUMGSequencePlayMode::Type PlayMode, float PlaybackSpeed)
 //{
 //	UWidgetAnimation* WidgetAnim = GetAnimationByName(AnimationName);

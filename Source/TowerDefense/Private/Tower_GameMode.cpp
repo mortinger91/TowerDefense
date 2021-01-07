@@ -3,15 +3,12 @@
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"
+#include "Stats_HUD.h"
+#include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "Components/TimelineComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Stats_HUD.h"
-// spostare in stats_hud
-#include "Components/TextBlock.h"
-#include "Game_UserWidget.h"
-
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
@@ -38,7 +35,7 @@ void ATower_GameMode::BeginPlay()
 
 	UE_LOG(LogActor, Warning, TEXT("Loaded Tower_GameMode"))
 
-	HandleNewState(EGamePlayState::EPlaying);
+	ChangeGamePlayState(EGamePlayState::EPlaying);
 
 	GS = Cast<ATower_GameState>(GetWorld()->GetGameState());
 	if (GS == nullptr)
@@ -85,36 +82,17 @@ void ATower_GameMode::SetHealth()
 		CurveFloatValue = PreviousHealth + HealthDamage*HealthCurve->GetFloatValue(TimelineValue);
 		GS->Health = UKismetMathLibrary::Round(CurveFloatValue*MaxHealth);
 
-		Cast<UTextBlock>(HudWidgetPlayer->GetHUDWidget()->GetWidgetFromName(FName("Health_Text")))->SetText(GS->GetHealthText());
+		HudWidgetPlayer->UpdateHealthText(GS->GetHealthText());
 
 		GS->HealthPercentage = CurveFloatValue;
 		// if health reaches 0, enter gameover state
 		if (GS->Health <= 0)
 		{
 			MyTimeline->Stop();
-			HandleNewState(EGamePlayState::EGameOver);
+			ChangeGamePlayState(EGamePlayState::EGameOver);
 		}
 	}
 }
-
-//void ATower_GameMode::OnTargetHit()
-//{
-//	if (ATower_GameState* GS = Cast<ATower_GameState>(GameState))
-//	{
-//		GS->Points++;
-//
-//		if (GS->Points >= PointsToWin)
-//		{
-//			//UE_LOG(LogTemp, Warning, TEXT("You won the gaem!!!1"));
-//			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("You won the game, you took %f seconds to win the game."), GetWorld()->GetTimeSeconds()));
-//		}
-//		else
-//		{
-//			//UE_LOG(LogTemp, Warning, TEXT("You scored a point. You now have %d points"), GS->Points);
-//			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("You scored a point. You now have %d points."), GS->Points));
-//		}
-//	}
-//}
 
 // add to the player golds, return updated amount
 void ATower_GameMode::AddGold(float gold)
@@ -131,23 +109,32 @@ void ATower_GameMode::AddGold(float gold)
 		}
 	}
 	HudWidgetPlayer->UpdateGoldText(GS->Gold);
-	//return GS->Gold;
 
 }
 
 void ATower_GameMode::AddToEndPositions(const FVector& fv)
 {
 	UE_LOG(LogActor, Warning, TEXT("Added End point, coordinates: x: %f, y: %f, z: %f"), fv.X, fv.Y, fv.Z)
-	EndPointPosition.push_back(fv);
+	//EndPointPosition.push_back(fv);
+	EndPointPosition.Add(fv);
 }
 
 // returns only the first saved position, only 1 end point is supported
-FVector ATower_GameMode::GetEndPositions()
+bool ATower_GameMode::GetEndPositions(FVector &returnVector)
 {
-	return EndPointPosition[0];
+	//if (EndPointPosition.size() < 1)
+	if (EndPointPosition.Num() < 1)
+	{
+		return false;
+	}
+	else
+	{
+		returnVector = EndPointPosition[0];
+		return true;
+	}
 }
 
-void ATower_GameMode::HandleNewState(EGamePlayState NewState)
+void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 {
 	CurrentState = NewState;
 	switch (CurrentState)
@@ -163,8 +150,6 @@ void ATower_GameMode::HandleNewState(EGamePlayState NewState)
 			InitiateGameOver = true;
 			// restart the level
 			UE_LOG(LogActor, Warning, TEXT("WE FUCKING LOST!"))
-			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("WE FUCKING LOST!")));
-			//UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 
 			HudWidgetPlayer->GameOverMode();
 

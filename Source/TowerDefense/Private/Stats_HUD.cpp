@@ -2,14 +2,17 @@
 
 
 #include "Stats_HUD.h"
+#include "Tower_GameMode.h"
+#include "Game_UserWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "Animation/WidgetAnimation.h"
-#include "Game_UserWidget.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Components/Button.h"
 
 AStats_HUD::AStats_HUD()
 {
-	static ConstructorHelpers::FClassFinder<UGame_UserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/New_Game_UI"));
+	static ConstructorHelpers::FClassFinder<UGame_UserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/Game_UI"));
 	HUDWidgetClass = HealthBarObj.Class;
 	
 }
@@ -27,7 +30,16 @@ void AStats_HUD::BeginPlay()
 			CurrentWidget->AddToViewport();
 		}
 	}
+
+	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
+	if (GM == nullptr)
+	{
+		UE_LOG(LogActor, Warning, TEXT("In Stats_HUD: Game Mode not found!"))
+	}
+
+	Cast<UButton>(CurrentWidget->GetWidgetFromName(FName("QuitGame_Button")))->OnClicked.AddDynamic(this, &AStats_HUD::QuitGameAction);
 }
+
 
 void AStats_HUD::DrawHUD()
 {
@@ -35,36 +47,11 @@ void AStats_HUD::DrawHUD()
 
 }
 
-//void AssignAnimations()
-//{
-//    UProperty* prop = GetClass()->PropertyLink;
-//
-//    // Run through all properties of this class to find any widget animations
-//    while( prop != nullptr  )
-//    {
-//        // Only interested in object properties
-//        if( prop->GetClass() == UObjectProperty::StaticClass() )
-//        {
-//            UObjectProperty* objectProp = Cast<UObjectProperty>(prop);
-//
-//            // Only want the properties that are widget animations
-//            if( objectProp->PropertyClass == UWidgetAnimation::StaticClass() )
-//            {
-//                UObject* object = objectProp->GetObjectPropertyValue_InContainer( this );
-//
-//                UWidgetAnimation* widgetAnim = Cast<UWidgetAnimation>(object);
-//
-//                if( widgetAnim != nullptr )
-//                {
-//                    // DO SOMETHING TO STORE OFF THE ANIM PTR HERE!
-//                    // E.g. add to a TArray of some struct that holds info for each anim
-//                }
-//            }
-//        }
-//
-//        prop = prop->PropertyLinkNext;
-//    }
-//}
+// update the health text in the player hud
+void AStats_HUD::UpdateHealthText(FText NewHealthText)
+{
+	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("Health_Text")))->SetText(NewHealthText);
+}
 
 // update the gold count in the player hud
 void AStats_HUD::UpdateGoldText(int32 NewGoldCount)
@@ -75,14 +62,7 @@ void AStats_HUD::UpdateGoldText(int32 NewGoldCount)
 	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("Gold_Text")))->SetText(GText);
 }
 
-//void AStats_HUD::UpdateHealthText(int32 NewHealth)
-//{
-//	FString G = FString::FromInt(NewHealth);
-//	FText GText = FText::FromString(G);
-//
-//	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("Health_Text")))->SetText(GText);
-//}
-
+// game over animation, called in game mode when gameover state is set
 void AStats_HUD::GameOverMode()
 {
 	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("GAME_OVER_Text")))->SetVisibility(ESlateVisibility::Visible);
@@ -94,4 +74,9 @@ void AStats_HUD::GameOverMode()
 UGame_UserWidget * AStats_HUD::GetHUDWidget()
 {
 	return CurrentWidget;
+}
+
+void AStats_HUD::QuitGameAction()
+{
+	GM->ChangeGamePlayState(EGamePlayState::EGameOver);
 }

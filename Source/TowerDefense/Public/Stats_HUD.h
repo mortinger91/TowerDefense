@@ -23,21 +23,14 @@ public:
 
 	class UGame_UserWidget * GetHUDWidget();
 
+	void UpdateHealthText(FText NewHealthText);
+
 	void UpdateGoldText(int32 NewGoldCount);
 
-	//void UpdateHealthText(int32 NewHealth);
-
+	UFUNCTION()
 	void GameOverMode();
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-	//class UWidgetAnimation* GameOverAnimation;
-
 private:
-	//UPROPERTY(EditAnywhere, Category = "Stats")
-	//TSubclassOf<class UUserWidget> HUDWidgetClass;
-
-	//UPROPERTY(EditAnywhere, Category = "Stats")
-	//class UUserWidget * CurrentWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
 	TSubclassOf<class UGame_UserWidget> HUDWidgetClass;
@@ -45,4 +38,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Stats")
 	class UGame_UserWidget * CurrentWidget;
 
+	class ATower_GameMode* GM;
+
+	UFUNCTION()
+	void QuitGameAction();
 };

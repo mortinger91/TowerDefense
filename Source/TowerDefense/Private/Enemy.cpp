@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#pragma optimize("", off)
+//#pragma optimize("", off)
 
 #include "Enemy.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -23,10 +23,15 @@ AEnemy::AEnemy()
 	HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Health Widget");
 	HealthWidgetComponent ->AttachToComponent(RootComponent, rules);
 
-	//GetCharacterMovement()->bOrientRotationToMovement = true;
-	//GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	this->bUseControllerRotationYaw = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 200.f, 0.f);
+	//GetCharacterMovement()->bSweepWhileNavWalking = 1;
+	//GetCharacterMovement()->yaw
 
-	GetCharacterMovement()->MaxWalkSpeed = 450.f;
+	//GetCharacterMovement()->MaxWalkSpeed = 450.f;
+	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 
 	maxHealth = 100.f;
 	health = maxHealth;
@@ -76,7 +81,9 @@ void AEnemy::Tick(float DeltaTime)
 
 void AEnemy::Move()
 {
-	FVector dest = GM->GetEndPositions();
+	FVector dest;
+	GM->GetEndPositions(dest);
+	//UE_LOG(LogActor, Warning, TEXT("Moving Enemy to coordinates: x: %f, y: %f, z: %f"), dest.X, dest.Y, dest.Z)
 	ai->MoveToLocation(dest, -1, false, true, false, false, NULL, true);
 }
 
