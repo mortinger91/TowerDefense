@@ -30,7 +30,7 @@ void AEndPoint::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In EndPoint: Game Mode not found!"))
 	}
 
-	SetEndPointPosition();
+	//SetEndPointPosition();
 	
 }
 
@@ -41,10 +41,10 @@ void AEndPoint::Tick(float DeltaTime)
 
 }
 
-void AEndPoint::SetEndPointPosition()
-{
-	GM->AddToEndPositions(GetActorLocation());
-}
+//void AEndPoint::SetEndPointPosition()
+//{
+//	GM->AddToEndPositions(GetActorLocation());
+//}
 
 void AEndPoint::RemoveHealth(AActor * SelfActor, AActor * OtherActor, FVector NormalImpulse, const FHitResult & Hit)
 {

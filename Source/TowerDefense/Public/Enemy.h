@@ -18,13 +18,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Move();
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 	void GetDamaged(float damage);
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	//void Move();
 
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystemComponent* Particles;
@@ -43,7 +43,7 @@ protected:
 	// own health bar
 	UUserWidget * HealthWidgetEnemy;
 
-	class AAIController* ai;
+	class AEnemy_AIController* ai;
 
 	class ATower_GameMode * GM;
 

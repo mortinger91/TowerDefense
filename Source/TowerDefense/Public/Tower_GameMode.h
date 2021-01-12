@@ -56,9 +56,9 @@ public:
 	void AddGold(float gold);
 
 	// end positions
-	void AddToEndPositions(const FVector& fv);
+	//void AddToEndPositions(const FVector& fv);
 
-	bool GetEndPositions(FVector &returnVector);
+	//bool GetEndPositions(FVector &returnVector);
 
 	// Handle any function calls that rely upon changing the playing state of our game
 	void ChangeGamePlayState(EGamePlayState NewState);
@@ -79,4 +79,5 @@ private:
 	// player hud, update gold count when enemy dies
 	class AStats_HUD * HudWidgetPlayer;
 
+	APlayerController* PC;
 };

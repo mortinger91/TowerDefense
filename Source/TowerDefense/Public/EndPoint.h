@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "components")
 	UStaticMeshComponent* EndMesh;
 
-	void SetEndPointPosition();
+	//void SetEndPointPosition();
 
 protected:
 	// Called when the game starts or when spawned

@@ -35,6 +35,17 @@ void ATower_GameMode::BeginPlay()
 
 	UE_LOG(LogActor, Warning, TEXT("Loaded Tower_GameMode"))
 
+	PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		FInputModeGameAndUI data;
+		data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+		PC->SetInputMode(data);
+		PC->bShowMouseCursor = true; 
+		PC->bEnableClickEvents = true; 
+		PC->bEnableMouseOverEvents = true;
+	}
+
 	ChangeGamePlayState(EGamePlayState::EPlaying);
 
 	GS = Cast<ATower_GameState>(GetWorld()->GetGameState());
@@ -112,27 +123,27 @@ void ATower_GameMode::AddGold(float gold)
 
 }
 
-void ATower_GameMode::AddToEndPositions(const FVector& fv)
-{
-	UE_LOG(LogActor, Warning, TEXT("Added End point, coordinates: x: %f, y: %f, z: %f"), fv.X, fv.Y, fv.Z)
-	//EndPointPosition.push_back(fv);
-	EndPointPosition.Add(fv);
-}
-
-// returns only the first saved position, only 1 end point is supported
-bool ATower_GameMode::GetEndPositions(FVector &returnVector)
-{
-	//if (EndPointPosition.size() < 1)
-	if (EndPointPosition.Num() < 1)
-	{
-		return false;
-	}
-	else
-	{
-		returnVector = EndPointPosition[0];
-		return true;
-	}
-}
+//void ATower_GameMode::AddToEndPositions(const FVector& fv)
+//{
+//	UE_LOG(LogActor, Warning, TEXT("Added End point, coordinates: x: %f, y: %f, z: %f"), fv.X, fv.Y, fv.Z)
+//	//EndPointPosition.push_back(fv);
+//	EndPointPosition.Add(fv);
+//}
+//
+//// returns only the first saved position, only 1 end point is supported
+//bool ATower_GameMode::GetEndPositions(FVector &returnVector)
+//{
+//	//if (EndPointPosition.size() < 1)
+//	if (EndPointPosition.Num() < 1)
+//	{
+//		return false;
+//	}
+//	else
+//	{
+//		returnVector = EndPointPosition[0];
+//		return true;
+//	}
+//}
 
 void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 {

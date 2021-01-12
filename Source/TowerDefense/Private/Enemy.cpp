@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Enemy_AIController.h"
 #include "AIController.h"
 #include "Tower_GameMode.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -23,15 +24,16 @@ AEnemy::AEnemy()
 	HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Health Widget");
 	HealthWidgetComponent ->AttachToComponent(RootComponent, rules);
 
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	this->bUseControllerRotationYaw = false;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 200.f, 0.f);
-	//GetCharacterMovement()->bSweepWhileNavWalking = 1;
-	//GetCharacterMovement()->yaw
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	//GetCharacterMovement()->bOrientRotationToMovement = false;
+	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	//this->bUseControllerRotationYaw = false;
+	//GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
 
-	//GetCharacterMovement()->MaxWalkSpeed = 450.f;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+
+	GetCharacterMovement()->bUseRVOAvoidance = true;
+	GetCharacterMovement()->AvoidanceWeight = 0.5f;
 
 	maxHealth = 100.f;
 	health = maxHealth;
@@ -57,19 +59,15 @@ void AEnemy::BeginPlay()
 	
 	Cast<UProgressBar>(HealthWidgetEnemy->GetWidgetFromName(FName("Health_Bar")))->SetPercent(1.f);
 
-	//HudWidgetPlayer = Cast<AStats_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	//if (HudWidgetPlayer == nullptr)
-	//{
-	//	UE_LOG(LogActor, Warning, TEXT("In Enemy: HUD Widget not found!"))
-	//}
-
-	ai = Cast<AAIController>(GetController());
+	ai = Cast<AEnemy_AIController>(GetController());
 	if (ai == nullptr)
 	{
-		UE_LOG(LogActor, Warning, TEXT("In Enemy: AAIController not found!"))
+		UE_LOG(LogActor, Warning, TEXT("In Enemy: AEnemy_AIController not found!"))
 	}
+	//Move();
 
-	Move();
+	ai->GoToRandomEndPoint();
+
 }
 
 // Called every frame
@@ -79,13 +77,13 @@ void AEnemy::Tick(float DeltaTime)
 
 }
 
-void AEnemy::Move()
-{
-	FVector dest;
-	GM->GetEndPositions(dest);
-	//UE_LOG(LogActor, Warning, TEXT("Moving Enemy to coordinates: x: %f, y: %f, z: %f"), dest.X, dest.Y, dest.Z)
-	ai->MoveToLocation(dest, -1, false, true, false, false, NULL, true);
-}
+//void AEnemy::Move()
+//{
+//	FVector dest;
+//	GM->GetEndPositions(dest);
+//	//UE_LOG(LogActor, Warning, TEXT("Moving Enemy to coordinates: x: %f, y: %f, z: %f"), dest.X, dest.Y, dest.Z)
+//	ai->MoveToLocation(dest, -1, false, true, false, false, NULL, true);
+//}
 
 void AEnemy::UpdateEnemyHealth()
 {
