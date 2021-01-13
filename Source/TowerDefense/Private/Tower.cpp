@@ -1,4 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+#pragma optimize("", off)
 
 
 #include "Tower.h"
@@ -34,6 +35,9 @@ void ATower::BeginPlay()
 	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket2")) + FVector(-shiftSock, 0.f, 0.f) );
 	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket3")) + FVector(0.f, -shiftSock, 0.f) );
 	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket4")) + FVector(0.f, shiftSock, 0.f) );
+
+	//OnClicked.AddDynamic(this, &ATower::OnClickedAction);
+	OnClicked.AddDynamic(this, &ATower::OnClickedAction);
 }
 
 // Called every frame
@@ -41,5 +45,12 @@ void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATower::OnClickedAction(AActor* TouchedActor, FKey ButtonPressed)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString("OnClickedAction!!!"));
+	UE_LOG(LogActor, Warning, TEXT("OnClickedAction"))
+	int x = 0;
 }
 

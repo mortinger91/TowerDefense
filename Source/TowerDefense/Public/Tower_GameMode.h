@@ -78,6 +78,4 @@ private:
 
 	// player hud, update gold count when enemy dies
 	class AStats_HUD * HudWidgetPlayer;
-
-	APlayerController* PC;
 };

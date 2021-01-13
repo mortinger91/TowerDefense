@@ -92,15 +92,16 @@ void ACustomPawn::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void ACustomPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACustomPawn::Shoot);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ACustomPawn::MoveForward); 
-	PlayerInputComponent->BindAxis("MoveRight", this, &ACustomPawn::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &ACustomPawn::Turn);
-	PlayerInputComponent->BindAxis("LookUp", this, &ACustomPawn::LookUp);
-
-}
+// Funzione usata per bindare gli input direttamente dentro il pawn, il che non richiede di definire un custom playercontroller
+//void ACustomPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+//{
+//	Super::SetupPlayerInputComponent(PlayerInputComponent);
+//
+//	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACustomPawn::Shoot);
+//
+//	PlayerInputComponent->BindAxis("MoveForward", this, &ACustomPawn::MoveForward); 
+//	PlayerInputComponent->BindAxis("MoveRight", this, &ACustomPawn::MoveRight);
+//	PlayerInputComponent->BindAxis("Turn", this, &ACustomPawn::Turn);
+//	PlayerInputComponent->BindAxis("LookUp", this, &ACustomPawn::LookUp);
+//
+//}

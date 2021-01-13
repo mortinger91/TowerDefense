@@ -35,17 +35,6 @@ void ATower_GameMode::BeginPlay()
 
 	UE_LOG(LogActor, Warning, TEXT("Loaded Tower_GameMode"))
 
-	PC = GetWorld()->GetFirstPlayerController();
-	if (PC)
-	{
-		FInputModeGameAndUI data;
-		data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
-		PC->SetInputMode(data);
-		PC->bShowMouseCursor = true; 
-		PC->bEnableClickEvents = true; 
-		PC->bEnableMouseOverEvents = true;
-	}
-
 	ChangeGamePlayState(EGamePlayState::EPlaying);
 
 	GS = Cast<ATower_GameState>(GetWorld()->GetGameState());

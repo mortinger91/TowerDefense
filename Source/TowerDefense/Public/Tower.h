@@ -18,30 +18,32 @@ public:
 	UPROPERTY(EditAnywhere, Category = "cooldown")
 	class UCooldown* cooldownShot;
 
-	UPROPERTY(EditAnywhere, Category = "components")
-	UStaticMeshComponent* TowerMesh;
-
 	// array of sockets, points from where to shoot
 	TArray<FVector> sockets;
-
-	//UPROPERTY(EditAnywhere, Category = "Sockets")
-	float shiftSock;
 
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystem* particlesShooting;
 
-	UPROPERTY(EditAnywhere, Category = "TowerDamage")
-	float damage;
-
 	UPROPERTY(EditAnywhere, Category = "Shooting")
 	TSubclassOf<class ABullet> BulletClass;
+
+	UPROPERTY(EditAnywhere, Category = "TowerDamage")
+	float damage;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
+	UPROPERTY(EditAnywhere, Category = "components")
+	UStaticMeshComponent* TowerMesh;
+
+	//UPROPERTY(EditAnywhere, Category = "Sockets")
+	float shiftSock;
+
+	UFUNCTION(BlueprintCallable)
+	void OnClickedAction(AActor* TouchedActor, FKey ButtonPressed);
+
 };

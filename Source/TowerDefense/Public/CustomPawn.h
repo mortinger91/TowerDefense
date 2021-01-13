@@ -15,9 +15,14 @@ public:
 	// Sets default values for this pawn's properties
 	ACustomPawn();
 
-protected:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Called to bind functionality to input
+	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void MoveForward(float Amount);
 	void MoveRight(float Amount);
@@ -25,6 +30,7 @@ protected:
 	void LookUp(float Amount);
 	void Shoot();
 
+private:
 	UPROPERTY(EditAnywhere, Category = "Shooting")
 	TSubclassOf<class ABullet> BulletClass;
 
@@ -38,12 +44,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	class USpringArmComponent* CameraArm;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };

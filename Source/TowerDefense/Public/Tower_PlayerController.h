@@ -24,15 +24,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	// Called to bind functionality to input
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupInputComponent() override;
 
-	//void MoveForward(float Amount);
+	void MoveForward(float Amount);
 
-	//void MoveRight(float Amount);
+	void MoveRight(float Amount);
 
-	//void Turn(float Amount);
+	void Turn(float Amount);
 
-	//void LookUp(float Amount);
+	void LookUp(float Amount);
 
+	void GetFoundActors();
+	//UPROPERTY(EditAnywhere, Category = "Stats")
+	//class UUserWidget * CursorWidgetClass;
 };
