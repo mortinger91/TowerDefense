@@ -9,24 +9,24 @@
 #include "TimerManager.h"
 #include "Components/TimelineComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Tower.h"
+#include "GameplayStats.h"
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
+	selectedTower = nullptr;
+	spawnedTower = nullptr;
+
 	MaxHealth = 10;
 	HealthDamage = 0.0f;
 	MaxGold = 999;
 
 	InitiateGameOver = false;
+	dragMode = false;
 
 	MyTimeline = NewObject<UTimelineComponent>(this, FName("Health_Animation"));
-}
-
-// Called every frame
-void ATower_GameMode::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (MyTimeline != nullptr) MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
 }
 
 void ATower_GameMode::BeginPlay()
@@ -63,6 +63,32 @@ void ATower_GameMode::BeginPlay()
     MyTimeline->AddInterpFloat(HealthCurve, TimelineCallback);
 	MyTimeline->RegisterComponent();
 
+	// errore all'avvio
+	//HudWidgetPlayer->UpdateGoldText(GS->Gold);
+}
+
+// Called every frame
+void ATower_GameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (MyTimeline != nullptr) MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+
+	if (dragMode)
+	{
+		FVector mouseLocation;
+		FVector mouseDirection;
+		GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+		
+		FHitResult OutHit;
+		FVector Start = mouseLocation;
+		FVector End = mouseLocation + mouseDirection*10000;
+		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic);
+		if (!(Cast<ATower>(OutHit.GetActor())))
+		{
+			spawnedTower->SetActorLocation(OutHit.Location);
+		}
+	}
 }
 
 void ATower_GameMode::Remove1Health()
@@ -95,7 +121,7 @@ void ATower_GameMode::SetHealth()
 }
 
 // add to the player golds, return updated amount
-void ATower_GameMode::AddGold(float gold)
+void ATower_GameMode::UpdateGold(float gold)
 {
 	if (GS->Gold < MaxGold)
 	{
@@ -109,30 +135,19 @@ void ATower_GameMode::AddGold(float gold)
 		}
 	}
 	HudWidgetPlayer->UpdateGoldText(GS->Gold);
-
 }
 
-//void ATower_GameMode::AddToEndPositions(const FVector& fv)
-//{
-//	UE_LOG(LogActor, Warning, TEXT("Added End point, coordinates: x: %f, y: %f, z: %f"), fv.X, fv.Y, fv.Z)
-//	//EndPointPosition.push_back(fv);
-//	EndPointPosition.Add(fv);
-//}
-//
-//// returns only the first saved position, only 1 end point is supported
-//bool ATower_GameMode::GetEndPositions(FVector &returnVector)
-//{
-//	//if (EndPointPosition.size() < 1)
-//	if (EndPointPosition.Num() < 1)
-//	{
-//		return false;
-//	}
-//	else
-//	{
-//		returnVector = EndPointPosition[0];
-//		return true;
-//	}
-//}
+bool ATower_GameMode::GoldAvailable(int32 GoldToCheck)
+{
+	if (GS->GetGold() >= GoldToCheck)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 {
@@ -151,7 +166,7 @@ void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 			// restart the level
 			UE_LOG(LogActor, Warning, TEXT("WE FUCKING LOST!"))
 
-			HudWidgetPlayer->GameOverMode();
+			HudWidgetPlayer->PlayGameOverAnimation();
 
 			FTimerDelegate TimerDel;
 			FTimerHandle TimerHandle;
@@ -170,6 +185,47 @@ void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 		}
 		break;
 	}
+}
+
+void ATower_GameMode::LevelUpSelectedTower()
+{
+	selectedTower->LevelUp();
+	HudWidgetPlayer->ShowTowerTooltip();
+}
+
+void ATower_GameMode::SpawnTower(FString towerType)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.bNoFail = true;
+	//SpawnParams.Owner = this;
+
+	FTransform SpawnTransform;
+	//SpawnTransform.SetLocation(FVector(200.f,600.f,200.f));
+	SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
+
+	if (towerType == "Cannon")
+	{
+		if (GoldAvailable(Cannon::goldToBuild))
+		{
+			spawnedTower = GetWorld()->SpawnActor<ATower>(CannonTower, SpawnTransform, SpawnParams);
+			dragMode = true;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Cannon tower")));
+		}
+	}
+}
+
+void ATower_GameMode::FinalizeTowerSpawn()
+{
+	dragMode = false;
+	// check tower position
+	// if not ok, destroy tower
+	UpdateGold(-spawnedTower->GetGoldToBuild());
+	spawnedTower->Activate();
+	spawnedTower = nullptr;
 }
 
 void ATower_GameMode::GoToMainMenu()

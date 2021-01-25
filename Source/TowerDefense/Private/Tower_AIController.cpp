@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-//#pragma optimize("", off)
+#pragma optimize("", off)
 
 #include "Tower_AIController.h"
 #include "Perception/AIPerceptionComponent.h"
@@ -15,11 +15,13 @@ ATower_AIController::ATower_AIController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	isActive = false;
+
 	// component perception sight
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>("Sight Config");
 	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>("Perception Component"));
 	SightConfig->SightRadius = AISightRadius;
-	SightConfig->LoseSightRadius = AISightRadius;// + AILoseSightRadius;
+	SightConfig->LoseSightRadius = AISightRadius;
 	SightConfig->PeripheralVisionAngleDegrees = AIFieldOfView;
 	SightConfig->SetMaxAge(AISightAge);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
@@ -38,18 +40,18 @@ void ATower_AIController::BeginPlay()
 	{
 		UE_LOG(LogActor, Warning, TEXT("Perception Component not found!"))
 	}
-
-	tower = Cast<ATower>(GetPawn());
-	if (tower == nullptr)
-	{
-		UE_LOG(LogActor, Warning, TEXT("No Tower Pawn found for %s!"), *this->GetName())
-	}
+	
 }
 
 void ATower_AIController::OnPossess(APawn* MyPawn)
 {
 	Super::OnPossess(MyPawn);
 
+	tower = Cast<ATower>(GetPawn());
+	if (tower == nullptr)
+	{
+		UE_LOG(LogActor, Warning, TEXT("No Tower Pawn found for %s!"), *this->GetName())
+	}
 }
 
 // every frame the tower is checking the cooldown
@@ -62,59 +64,53 @@ void ATower_AIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (tower->cooldownShot->IsNotCooldown())
+	if (isActive)
 	{
-		// shooting the enemy from the DetectedPawns TArray which has the lowest CreationTime
-		if (DetectedPawns.Num() > 0)
+		if (tower->cooldownShot->IsNotCooldown())
 		{
-			int32 index = 0;
-			float min = DetectedPawns[0]->CreationTime;
-			for (int32 i = 0; i < DetectedPawns.Num(); ++i)
+			// shooting the enemy from the DetectedPawns TArray which has the lowest CreationTime
+			if (DetectedPawns.Num() > 0)
 			{
-				if (DetectedPawns[i]->CreationTime < min)
+				int32 index = 0;
+				float min = DetectedPawns[0]->CreationTime;
+				for (int32 i = 0; i < DetectedPawns.Num(); ++i)
 				{
-					min = DetectedPawns[i]->CreationTime;
-					index = i;
+					if (DetectedPawns[i]->CreationTime < min)
+					{
+						min = DetectedPawns[i]->CreationTime;
+						index = i;
+					}
 				}
+				Shoot(Cast<AEnemy>(DetectedPawns[index]));
+				tower->cooldownShot->StartCooldown();
 			}
-			Shoot(Cast<AEnemy>(DetectedPawns[index]));
-			tower->cooldownShot->StartCooldown();
 		}
 	}
 }
-
-//FRotator ATower_AIController::GetControlRotation() const
-//{
-//	if(GetPawn() == nullptr)
-//	{
-//		return FRotator(0.f, 0.f, 0.f);
-//	}
-//	else
-//	{
-//		return FRotator(0.f, GetPawn()->GetActorRotation().Yaw, 0.f);
-//	}
-//}
 
 // if an enemy enters the perception area, it is added in the DetectedPawns TArray
 // when an enemy exits(exits or gets killed) the perception area, it is removed from the DetectedPawns TArray
 void ATower_AIController::OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow)
 {
-	// aggiungere lock RAII da controllare prima di controllare DetectedPawns in tick
-	// per evitare che tick parta mentre OnPawnDetected sta modificando l'array DetectedPawns
-	if (DetectedPawnsNow.Last()->IsA(AEnemy::StaticClass()))
+	if (isActive)
 	{
-		for (int i = 0; i < DetectedPawnsNow.Num(); ++i)
+		// aggiungere lock RAII da controllare prima di controllare DetectedPawns in tick
+		// per evitare che tick parta mentre OnPawnDetected sta modificando l'array DetectedPawns
+		if (DetectedPawnsNow.Last()->IsA(AEnemy::StaticClass()))
 		{
-			int32 index = -1;
-			if (DetectedPawns.Find(DetectedPawnsNow[i], index))
+			for (int i = 0; i < DetectedPawnsNow.Num(); ++i)
 			{
-				DetectedPawns.RemoveAt(index);
-				UE_LOG(LogActor, Warning, TEXT("Enemy detected: %s, Removed!"), *DetectedPawnsNow[i]->GetName())
-			}
-			else
-			{
-				DetectedPawns.Add(DetectedPawnsNow[i]);
-				UE_LOG(LogActor, Warning, TEXT("Enemy detected: %s, Added!"), *DetectedPawnsNow[i]->GetName())
+				int32 index = -1;
+				if (DetectedPawns.Find(DetectedPawnsNow[i], index))
+				{
+					DetectedPawns.RemoveAt(index);
+					UE_LOG(LogActor, Warning, TEXT("Enemy detected: %s, Removed!"), *DetectedPawnsNow[i]->GetName())
+				}
+				else
+				{
+					DetectedPawns.Add(DetectedPawnsNow[i]);
+					UE_LOG(LogActor, Warning, TEXT("Enemy detected: %s, Added!"), *DetectedPawnsNow[i]->GetName())
+				}
 			}
 		}
 	}
@@ -166,4 +162,9 @@ void ATower_AIController::Shoot(const AEnemy* enemyToShoot)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), tower->particlesShooting, BulletSpawnTransform, true, EPSCPoolMethod::None, true);
 		GetWorld()->SpawnActor<ABullet>(tower->BulletClass, BulletSpawnTransform, SpawnParams);
 	}
+}
+
+void ATower_AIController::ActivateAI()
+{
+	isActive = true;
 }

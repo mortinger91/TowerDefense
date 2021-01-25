@@ -60,7 +60,7 @@ void ABullet::DealDamage(AEnemy * enemy)
 	float damage;
 	if (ATower* tower = Cast<ATower>(GetInstigator()))
 	{
-		damage = tower->damage;
+		damage = tower->GetDamage();
 	}
 	else
 	{

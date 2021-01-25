@@ -17,29 +17,37 @@ class TOWERDEFENSE_API AStats_HUD : public AHUD
 public:
 	AStats_HUD();
 	
-	virtual void BeginPlay() override;
-
-	virtual void DrawHUD() override;
-
-	class UGame_UserWidget * GetHUDWidget();
-
 	void UpdateHealthText(FText NewHealthText);
 
 	void UpdateGoldText(int32 NewGoldCount);
 
 	UFUNCTION()
-	void GameOverMode();
+	void PlayGameOverAnimation();
+
+	void ShowTowerTooltip();
+
+	void HideTowerTooltip();
 
 private:
+
+	virtual void BeginPlay() override;
+
+	virtual void DrawHUD() override;
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
 	TSubclassOf<class UGame_UserWidget> HUDWidgetClass;
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
-	class UGame_UserWidget * CurrentWidget;
+	class UGame_UserWidget * GameUIWidget;
 
 	class ATower_GameMode* GM;
 
 	UFUNCTION()
 	void QuitGameAction();
+
+	UFUNCTION()
+	void LevelUpAction();
+
+	UFUNCTION()
+	void SpawnTowerCannonAction();
 };

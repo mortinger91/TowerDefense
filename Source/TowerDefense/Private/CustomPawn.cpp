@@ -19,16 +19,17 @@ ACustomPawn::ACustomPawn()
 	
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 
+	SetRootComponent(StaticMesh);
+
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>("CameraSpringArm");
 	CameraArm->SetupAttachment(StaticMesh);
-	CameraArm->TargetArmLength = 400.f;
+	//CameraArm->TargetArmLength = 400.f;
+	CameraArm->TargetArmLength = 0.f;
 	
 	Camera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	//non piu necessario perche la camera è attaccata al camera arm il quale è gia 500 unità dietro al player
 	//Camera->SetRelativeLocation(FVector(-500.f, 0.f, 0.f));
 	Camera->SetupAttachment(CameraArm);
-
-	SetRootComponent(StaticMesh);
 
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;

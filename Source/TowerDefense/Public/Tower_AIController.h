@@ -29,7 +29,7 @@ public:
 	void OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-	float AISightRadius = 1000.f;
+	float AISightRadius = 800.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
 	float AISightAge = 0.f;
@@ -45,8 +45,12 @@ public:
 
 	void Shoot(const class AEnemy* enemyToShoot);
 
+	void ActivateAI();
+
 protected:
 	class ATower* tower;
 
 	TArray<AActor*> DetectedPawns;
+
+	bool isActive;
 };

@@ -34,7 +34,12 @@ private:
 
 	void LookUp(float Amount);
 
-	void GetFoundActors();
+	void ClickAction();
+
+	void ReleaseAction();
+	
 	//UPROPERTY(EditAnywhere, Category = "Stats")
 	//class UUserWidget * CursorWidgetClass;
+	
+	class ATower_GameMode* GM;
 };

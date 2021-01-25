@@ -53,18 +53,30 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gold")
 	int32 MaxGold;
 
-	void AddGold(float gold);
+	void UpdateGold(float gold);
 
-	// end positions
-	//void AddToEndPositions(const FVector& fv);
-
-	//bool GetEndPositions(FVector &returnVector);
+	bool GoldAvailable(int32 GoldToCheck);
 
 	// Handle any function calls that rely upon changing the playing state of our game
 	void ChangeGamePlayState(EGamePlayState NewState);
 
+	class ATower * selectedTower;
+
+	void LevelUpSelectedTower();
+
+	// player hud, update gold count when enemy dies
+	class AStats_HUD * HudWidgetPlayer;
+
+	bool dragMode;
+
+	void SpawnTower(FString towerType);
+
+	class ATower * spawnedTower;
+
+	void FinalizeTowerSpawn(); 
+
 private:
-	TArray<FVector> EndPointPosition;
+	//TArray<FVector> EndPointPosition;
 
 	class ATower_GameState* GS;
 	
@@ -76,6 +88,8 @@ private:
 
 	bool InitiateGameOver;
 
-	// player hud, update gold count when enemy dies
-	class AStats_HUD * HudWidgetPlayer;
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	//TSubclassOf<class ATower> CannonTower;
+	TSubclassOf<class AActor> CannonTower;
+
 };

@@ -9,6 +9,8 @@
 #include "Animation/WidgetAnimation.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
+#include "Tower.h"
 
 AStats_HUD::AStats_HUD()
 {
@@ -23,11 +25,11 @@ void AStats_HUD::BeginPlay()
 
 	if (HUDWidgetClass != nullptr)
 	{
-		CurrentWidget = CreateWidget<UGame_UserWidget>(GetWorld(), HUDWidgetClass);
+		GameUIWidget = CreateWidget<UGame_UserWidget>(GetWorld(), HUDWidgetClass);
 
-		if (CurrentWidget != nullptr)
+		if (GameUIWidget != nullptr)
 		{
-			CurrentWidget->AddToViewport();
+			GameUIWidget->AddToViewport();
 		}
 	}
 
@@ -37,7 +39,11 @@ void AStats_HUD::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In Stats_HUD: Game Mode not found!"))
 	}
 
-	Cast<UButton>(CurrentWidget->GetWidgetFromName(FName("QuitGame_Button")))->OnClicked.AddDynamic(this, &AStats_HUD::QuitGameAction);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("QuitGame_Button")))->OnClicked.AddDynamic(this, &AStats_HUD::QuitGameAction);
+
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->OnClicked.AddDynamic(this, &AStats_HUD::LevelUpAction);
+
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnClicked.AddDynamic(this, &AStats_HUD::SpawnTowerCannonAction);
 }
 
 
@@ -50,7 +56,7 @@ void AStats_HUD::DrawHUD()
 // update the health text in the player hud
 void AStats_HUD::UpdateHealthText(FText NewHealthText)
 {
-	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("Health_Text")))->SetText(NewHealthText);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Health_Current")))->SetText(NewHealthText);
 }
 
 // update the gold count in the player hud
@@ -59,24 +65,61 @@ void AStats_HUD::UpdateGoldText(int32 NewGoldCount)
 	FString G = FString::FromInt(NewGoldCount);
 	FText GText = FText::FromString(G);
 
-	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("Gold_Text")))->SetText(GText);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Gold_Text")))->SetText(GText);
 }
 
 // game over animation, called in game mode when gameover state is set
-void AStats_HUD::GameOverMode()
+void AStats_HUD::PlayGameOverAnimation()
 {
-	Cast<UTextBlock>(GetHUDWidget()->GetWidgetFromName(FName("GAME_OVER_Text")))->SetVisibility(ESlateVisibility::Visible);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("GAME_OVER_Text")))->SetVisibility(ESlateVisibility::Visible);
 
-	UWidgetAnimation* anim = GetHUDWidget()->GetAnimationByName(FName("Fade"));
-	GetHUDWidget()->PlayAnimation(anim);
+	UWidgetAnimation* anim = GameUIWidget->GetAnimationByName(FName("Fade"));
+	GameUIWidget->PlayAnimation(anim);
 }
 
-UGame_UserWidget * AStats_HUD::GetHUDWidget()
+void AStats_HUD::ShowTowerTooltip()
 {
-	return CurrentWidget;
+	FText TowerType = FText::FromString(FString(TEXT("Type: ")) + GM->selectedTower->towerType);
+	FText Level = FText::FromString(FString(TEXT("Lvl: ")) + FString::FromInt(GM->selectedTower->GetLevel()));
+	FText UpgradeGold = FText::FromString(FString::FromInt(GM->selectedTower->GetGoldToUpgrade()) + FString(TEXT("g")));
+										
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetText(TowerType);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetText(Level);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetText(UpgradeGold);
+
+	Cast<UImage>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Background")))->SetVisibility(ESlateVisibility::Visible);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetVisibility(ESlateVisibility::Visible); 
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetVisibility(ESlateVisibility::Visible);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->SetVisibility(ESlateVisibility::Visible);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetVisibility(ESlateVisibility::Visible);
+
+	if (GM->selectedTower->GetLevel() == 3)
+	{
+		Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->SetVisibility(ESlateVisibility::Hidden);
+		Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void AStats_HUD::HideTowerTooltip()
+{
+	Cast<UImage>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Background")))->SetVisibility(ESlateVisibility::Hidden);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetVisibility(ESlateVisibility::Hidden);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetVisibility(ESlateVisibility::Hidden);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->SetVisibility(ESlateVisibility::Hidden);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AStats_HUD::QuitGameAction()
 {
 	GM->ChangeGamePlayState(EGamePlayState::EGameOver);
+}
+
+void AStats_HUD::LevelUpAction()
+{
+	GM->LevelUpSelectedTower();
+}
+
+void AStats_HUD::SpawnTowerCannonAction()
+{
+	GM->SpawnTower("Cannon");
 }

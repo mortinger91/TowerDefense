@@ -9,7 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
-
+#include "Engine/World.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -35,8 +35,6 @@ AEnemy::AEnemy()
 	GetCharacterMovement()->bUseRVOAvoidance = true;
 	GetCharacterMovement()->AvoidanceWeight = 0.5f;
 
-	maxHealth = 100.f;
-	health = maxHealth;
 	gold = 1.f;
 }
 
@@ -44,6 +42,14 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// ogni 30 secondi il moltiplicatore aumenta di 0.5
+	float healthMultiplier = 1.f + int32(GetWorld()->GetRealTimeSeconds() / 30) * 0.5f;
+
+	maxHealth = 100.f*healthMultiplier;
+	UE_LOG(LogActor, Warning, TEXT("Spawned Enemy with health: %f at time: %f"), maxHealth, GetWorld()->GetRealTimeSeconds())
+	health = maxHealth;
+
 	
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
@@ -51,7 +57,7 @@ void AEnemy::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In Enemy: Game Mode not found!"))
 	}
 
-	HealthWidgetEnemy = Cast<UUserWidget>(HealthWidgetComponent ->GetUserWidgetObject());
+	HealthWidgetEnemy = Cast<UUserWidget>(HealthWidgetComponent->GetUserWidgetObject());
 	if (HealthWidgetEnemy == nullptr)
 	{
 		UE_LOG(LogActor, Warning, TEXT("In Enemy: HealthWidgetEnemy not found!"))
@@ -64,7 +70,6 @@ void AEnemy::BeginPlay()
 	{
 		UE_LOG(LogActor, Warning, TEXT("In Enemy: AEnemy_AIController not found!"))
 	}
-	//Move();
 
 	ai->GoToRandomEndPoint();
 
@@ -76,14 +81,6 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-//void AEnemy::Move()
-//{
-//	FVector dest;
-//	GM->GetEndPositions(dest);
-//	//UE_LOG(LogActor, Warning, TEXT("Moving Enemy to coordinates: x: %f, y: %f, z: %f"), dest.X, dest.Y, dest.Z)
-//	ai->MoveToLocation(dest, -1, false, true, false, false, NULL, true);
-//}
 
 void AEnemy::UpdateEnemyHealth()
 {
@@ -98,7 +95,7 @@ void AEnemy::GetDamaged(float damage)
 
 	if (health <= 0)
 	{
-		GM->AddGold(gold);
+		GM->UpdateGold(gold);
 
 		Destroy();
 

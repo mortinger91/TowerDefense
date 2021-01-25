@@ -7,7 +7,7 @@
 
 ATower_GameState::ATower_GameState()
 {
-	Gold = 0;
+	Gold = 20;
 	HealthPercentage = 1.f; 
 }
 
@@ -29,7 +29,7 @@ float ATower_GameState::GetHealthPercentage()
 
 FText ATower_GameState::GetHealthText()
 {
-	FString HP = FString::FromInt(Health) + FString(TEXT("/") + FString::FromInt(GM->MaxHealth));
+	FString HP = FString::FromInt(Health);// + FString(TEXT("/") + FString::FromInt(GM->MaxHealth));
 	FText HPText = FText::FromString(HP);
 	return HPText;
 }

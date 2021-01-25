@@ -18,17 +18,30 @@ public:
 	UPROPERTY(EditAnywhere, Category = "cooldown")
 	class UCooldown* cooldownShot;
 
-	// array of sockets, points from where to shoot
-	TArray<FVector> sockets;
-
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystem* particlesShooting;
 
 	UPROPERTY(EditAnywhere, Category = "Shooting")
 	TSubclassOf<class ABullet> BulletClass;
 
-	UPROPERTY(EditAnywhere, Category = "TowerDamage")
-	float damage;
+	// array of sockets, points from where to shoot
+	TArray<FVector> sockets;
+
+	float GetDamage(); //dipende dal livello
+
+	int32 GetLevel(); // restituisce il livello
+	 
+	void LevelUp(); // aumenta di livello se possibile
+
+	int32 GetGoldToUpgrade(); // restituisce i gold necessari al prossimo upgrade
+
+	int32 GetGoldToSell();
+
+	int32 GetGoldToBuild();
+
+	FString towerType; // il tipo della torre
+
+	void Activate();
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,13 +50,27 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	class ATower_GameMode* GM;
+
+	UPROPERTY(EditAnywhere, Category = "components")
+	class UCapsuleComponent* TowerCapsule;
+
 	UPROPERTY(EditAnywhere, Category = "components")
 	UStaticMeshComponent* TowerMesh;
 
-	//UPROPERTY(EditAnywhere, Category = "Sockets")
 	float shiftSock;
 
-	UFUNCTION(BlueprintCallable)
-	void OnClickedAction(AActor* TouchedActor, FKey ButtonPressed);
+	int32 level;
 
+	float damage1;
+	float damage2;
+	float damage3;
+	
+	int32 goldToBuild;
+	int32 goldToUpgrade1;
+	int32 goldToUpgrade2;
+	int32 goldToSell1;
+	int32 goldToSell2;
+	int32 goldToSell3;
+	
 };
