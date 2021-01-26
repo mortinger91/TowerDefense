@@ -32,6 +32,8 @@ public:
 	int32 GetLevel(); // restituisce il livello
 	 
 	void LevelUp(); // aumenta di livello se possibile
+	
+	void Sell(); // aumenta di livello se possibile
 
 	int32 GetGoldToUpgrade(); // restituisce i gold necessari al prossimo upgrade
 
@@ -43,6 +45,8 @@ public:
 
 	void Activate();
 
+	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,8 +56,8 @@ protected:
 
 	class ATower_GameMode* GM;
 
-	UPROPERTY(EditAnywhere, Category = "components")
-	class UCapsuleComponent* TowerCapsule;
+	//UPROPERTY(EditAnywhere, Category = "components")
+	//class UCapsuleComponent* TowerCapsule;
 
 	UPROPERTY(EditAnywhere, Category = "components")
 	UStaticMeshComponent* TowerMesh;

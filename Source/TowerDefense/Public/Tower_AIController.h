@@ -29,7 +29,8 @@ public:
 	void OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-	float AISightRadius = 800.f;
+	//float AISightRadius = 800.f;
+	float AISightRadius = 1200.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
 	float AISightAge = 0.f;

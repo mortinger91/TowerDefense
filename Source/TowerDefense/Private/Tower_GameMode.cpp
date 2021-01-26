@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-//#pragma optimize("", off)
+#pragma optimize("", off)
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"
@@ -83,11 +83,10 @@ void ATower_GameMode::Tick(float DeltaTime)
 		FHitResult OutHit;
 		FVector Start = mouseLocation;
 		FVector End = mouseLocation + mouseDirection*10000;
-		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic);
-		if (!(Cast<ATower>(OutHit.GetActor())))
-		{
-			spawnedTower->SetActorLocation(OutHit.Location);
-		}
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(spawnedTower);
+		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic, CollisionParams);
+		spawnedTower->SetActorLocation(OutHit.Location);
 	}
 }
 
@@ -193,6 +192,12 @@ void ATower_GameMode::LevelUpSelectedTower()
 	HudWidgetPlayer->ShowTowerTooltip();
 }
 
+void ATower_GameMode::SellSelectedTower()
+{
+	selectedTower->Sell();
+	HudWidgetPlayer->HideTowerTooltip();
+}
+
 void ATower_GameMode::SpawnTower(FString towerType)
 {
 	FActorSpawnParameters SpawnParams;
@@ -215,6 +220,10 @@ void ATower_GameMode::SpawnTower(FString towerType)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Cannon tower")));
 		}
+	}
+	else if (towerType == "Else")
+	{
+		// ...
 	}
 }
 

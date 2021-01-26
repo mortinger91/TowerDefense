@@ -8,7 +8,7 @@
 #include "Tower_GameMode.h"
 #include "GameplayStats.h"
 #include "Tower_AIController.h"
-#include "Components/CapsuleComponent.h"
+//#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ATower::ATower()
@@ -16,15 +16,17 @@ ATower::ATower()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
 
-	TowerCapsule = CreateDefaultSubobject<UCapsuleComponent>("TowerCapsule");
+	//TowerCapsule = CreateDefaultSubobject<UCapsuleComponent>("TowerCapsule");
 	TowerMesh = CreateDefaultSubobject<UStaticMeshComponent>("TowerMesh");
-	TowerMesh->SetupAttachment(TowerCapsule);
-	SetRootComponent(TowerCapsule);
+	//TowerMesh->SetupAttachment(TowerCapsule);
+	//SetRootComponent(TowerCapsule);
+	SetRootComponent(TowerMesh);
 
 	// component cooldown
 	cooldownShot = CreateDefaultSubobject<UCooldown>("cooldown");
 
-	shiftSock = 50.f;
+	shiftSock = 35.f;
+
 
 	// GAMEPLAY PARAMETERS
 	towerType = "Cannon";
@@ -122,6 +124,12 @@ void ATower::LevelUp()
 	}
 }
 
+void ATower::Sell()
+{
+	GM->UpdateGold(GetGoldToSell());
+	Destroy();
+}
+
 int32 ATower::GetGoldToUpgrade()
 {
 	switch (level)
@@ -171,12 +179,19 @@ int32 ATower::GetGoldToBuild()
 void ATower::Activate()
 {
 	// added ad hoc for the Tower_Merged_mesh
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket1")) + FVector(shiftSock, 0.f, 0.f) );
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket2")) + FVector(-shiftSock, 0.f, 0.f) );
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket3")) + FVector(0.f, -shiftSock, 0.f) );
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket4")) + FVector(0.f, shiftSock, 0.f) );
+	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket0")) + FVector(shiftSock, 0.f, 0.f) );
+	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket1")) + FVector(-shiftSock, 0.f, 0.f) );
+	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket2")) + FVector(0.f, -shiftSock, 0.f) );
+	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket3")) + FVector(0.f, shiftSock, 0.f) );
 
 	Cast<ATower_AIController>(GetController())->ActivateAI();
+}
+
+void ATower::GetActorEyesViewPoint(FVector & Location, FRotator & Rotation) const
+{
+	Location = TowerMesh->GetSocketLocation(FName("Head"));
+	Rotation = GetActorRotation();
+    //Rotation.Yaw -= GetMesh()->GetSocketTransform("head", RTS_ParentBoneSpace).Rotator().Roll;
 }
 
 

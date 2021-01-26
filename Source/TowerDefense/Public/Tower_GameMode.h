@@ -63,6 +63,7 @@ public:
 	class ATower * selectedTower;
 
 	void LevelUpSelectedTower();
+	void SellSelectedTower();
 
 	// player hud, update gold count when enemy dies
 	class AStats_HUD * HudWidgetPlayer;

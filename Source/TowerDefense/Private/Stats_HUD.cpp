@@ -43,7 +43,10 @@ void AStats_HUD::BeginPlay()
 
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->OnClicked.AddDynamic(this, &AStats_HUD::LevelUpAction);
 
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellButton")))->OnClicked.AddDynamic(this, &AStats_HUD::SellAction);
+
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnClicked.AddDynamic(this, &AStats_HUD::SpawnTowerCannonAction);
+
 }
 
 
@@ -82,16 +85,20 @@ void AStats_HUD::ShowTowerTooltip()
 	FText TowerType = FText::FromString(FString(TEXT("Type: ")) + GM->selectedTower->towerType);
 	FText Level = FText::FromString(FString(TEXT("Lvl: ")) + FString::FromInt(GM->selectedTower->GetLevel()));
 	FText UpgradeGold = FText::FromString(FString::FromInt(GM->selectedTower->GetGoldToUpgrade()) + FString(TEXT("g")));
+	FText SellGold = FText::FromString(FString::FromInt(GM->selectedTower->GetGoldToSell()) + FString(TEXT("g")));
 										
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetText(TowerType);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetText(Level);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetText(UpgradeGold);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellGold")))->SetText(SellGold);
 
 	Cast<UImage>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Background")))->SetVisibility(ESlateVisibility::Visible);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetVisibility(ESlateVisibility::Visible); 
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetVisibility(ESlateVisibility::Visible);
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->SetVisibility(ESlateVisibility::Visible);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetVisibility(ESlateVisibility::Visible);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellButton")))->SetVisibility(ESlateVisibility::Visible);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellGold")))->SetVisibility(ESlateVisibility::Visible);
 
 	if (GM->selectedTower->GetLevel() == 3)
 	{
@@ -107,6 +114,8 @@ void AStats_HUD::HideTowerTooltip()
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetVisibility(ESlateVisibility::Hidden);
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->SetVisibility(ESlateVisibility::Hidden);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetVisibility(ESlateVisibility::Hidden);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellButton")))->SetVisibility(ESlateVisibility::Hidden);
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellGold")))->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AStats_HUD::QuitGameAction()
@@ -117,6 +126,11 @@ void AStats_HUD::QuitGameAction()
 void AStats_HUD::LevelUpAction()
 {
 	GM->LevelUpSelectedTower();
+}
+
+void AStats_HUD::SellAction()
+{
+	GM->SellSelectedTower();
 }
 
 void AStats_HUD::SpawnTowerCannonAction()

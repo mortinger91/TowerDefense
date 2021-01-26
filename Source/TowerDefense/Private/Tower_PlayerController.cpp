@@ -111,7 +111,7 @@ void ATower_PlayerController::ClickAction()
 		if(ATower * tower = Cast<ATower>(Result.Actor))
 		{
 			GM->selectedTower = tower;
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Tower Actor: %s"), *GM->selectedTower->GetName()));
+			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Tower Actor: %s"), *GM->selectedTower->GetName()));
 
 			GM->HudWidgetPlayer->ShowTowerTooltip();
 		} else

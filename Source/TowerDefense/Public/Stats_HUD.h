@@ -29,7 +29,6 @@ public:
 	void HideTowerTooltip();
 
 private:
-
 	virtual void BeginPlay() override;
 
 	virtual void DrawHUD() override;
@@ -47,6 +46,9 @@ private:
 
 	UFUNCTION()
 	void LevelUpAction();
+
+	UFUNCTION()
+	void SellAction();
 
 	UFUNCTION()
 	void SpawnTowerCannonAction();
