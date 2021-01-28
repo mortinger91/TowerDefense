@@ -24,23 +24,21 @@ public:
 	void GetDamaged(float damage);
 
 protected:
-	//void Move();
-
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystemComponent* Particles;
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
 	float maxHealth;
 
-	float health;
-
 	UPROPERTY(EditAnywhere, Category = "Stats")
 	float gold;
-	
-	UPROPERTY(EditAnywhere, Category = "HealthWidget")
-	class UWidgetComponent* HealthWidgetComponent;
 
-	// own health bar
+	float health;
+	
+	// health bar widget component
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	class UWidgetComponent* HealthWidgetComponent;
+	TSubclassOf<class UUserWidget> HUDWidgetClass;
 	UUserWidget * HealthWidgetEnemy;
 
 	class AEnemy_AIController* ai;

@@ -8,7 +8,8 @@
 #include "Tower.h"
 #include "Tower_GameMode.h"
 #include "Stats_HUD.h"
-#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
+//#include "DrawDebugHelpers.h"
 
 //#include "GenericPlatform/ICursor.h"
 //#include "Blueprint/UserWidget.h"

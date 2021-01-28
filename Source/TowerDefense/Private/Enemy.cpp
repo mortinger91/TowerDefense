@@ -21,20 +21,29 @@ AEnemy::AEnemy()
 	FAttachmentTransformRules rules(EAttachmentRule::KeepRelative, false);
 	Particles->AttachToComponent(RootComponent, rules);
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/Enemy_Health_UI"));
+	HUDWidgetClass = HealthBarObj.Class;
 	HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Health Widget");
-	HealthWidgetComponent ->AttachToComponent(RootComponent, rules);
+	HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	HealthWidgetComponent->AttachToComponent(RootComponent, rules);
+	HealthWidgetComponent->SetWidgetClass(HUDWidgetClass);
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	HealthWidgetComponent->SetRelativeLocation(FVector(10.f, 0.f, 50.f));
+	HealthWidgetComponent->SetDrawSize(FVector2D(60.f, 15.f));
+
+	// servono?
+	GetCharacterMovement()->bUseRVOAvoidance = true;
+	GetCharacterMovement()->AvoidanceWeight = 0.5f;
 	//GetCharacterMovement()->bOrientRotationToMovement = false;
 	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	//this->bUseControllerRotationYaw = false;
 	//GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
 
+	
+	// stats
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
-
-	GetCharacterMovement()->bUseRVOAvoidance = true;
-	GetCharacterMovement()->AvoidanceWeight = 0.5f;
-
+	maxHealth = 100.f;
 	gold = 1.f;
 }
 
@@ -46,11 +55,10 @@ void AEnemy::BeginPlay()
 	// ogni 30 secondi il moltiplicatore aumenta di 0.5
 	float healthMultiplier = 1.f + int32(GetWorld()->GetRealTimeSeconds() / 30) * 0.5f;
 
-	maxHealth = 100.f*healthMultiplier;
+	maxHealth *= healthMultiplier;
 	UE_LOG(LogActor, Warning, TEXT("Spawned Enemy with health: %f at time: %f"), maxHealth, GetWorld()->GetRealTimeSeconds())
 	health = maxHealth;
 
-	
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
 	{
@@ -62,7 +70,6 @@ void AEnemy::BeginPlay()
 	{
 		UE_LOG(LogActor, Warning, TEXT("In Enemy: HealthWidgetEnemy not found!"))
 	}
-	
 	Cast<UProgressBar>(HealthWidgetEnemy->GetWidgetFromName(FName("Health_Bar")))->SetPercent(1.f);
 
 	ai = Cast<AEnemy_AIController>(GetController());
@@ -72,7 +79,6 @@ void AEnemy::BeginPlay()
 	}
 
 	ai->GoToRandomEndPoint();
-
 }
 
 // Called every frame

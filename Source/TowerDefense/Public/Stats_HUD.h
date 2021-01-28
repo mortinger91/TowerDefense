@@ -33,10 +33,10 @@ private:
 
 	virtual void DrawHUD() override;
 
-	UPROPERTY(EditAnywhere, Category = "Stats")
+	//UPROPERTY(EditAnywhere, Category = "Stats")
 	TSubclassOf<class UGame_UserWidget> HUDWidgetClass;
 
-	UPROPERTY(EditAnywhere, Category = "Stats")
+	//UPROPERTY(EditAnywhere, Category = "Stats")
 	class UGame_UserWidget * GameUIWidget;
 
 	class ATower_GameMode* GM;

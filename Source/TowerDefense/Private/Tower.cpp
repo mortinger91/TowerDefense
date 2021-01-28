@@ -9,6 +9,7 @@
 #include "GameplayStats.h"
 #include "Tower_AIController.h"
 //#include "Components/CapsuleComponent.h"
+#include "Engine/Engine.h"
 
 // Sets default values
 ATower::ATower()

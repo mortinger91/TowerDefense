@@ -36,12 +36,9 @@ void AEnemy_AIController::GoToRandomEndPoint()
 	MoveToActor(GetRandomEndPoint());
 }
 
-//AEndPoint * AEnemy_AIController::GetRandomEndPoint()
 ATargetPoint * AEnemy_AIController::GetRandomEndPoint()
 {
 	//auto index = FMath::RandRange(0, Waypoints.Num() - 1);
-
-	//return Cast<AEndPoint>(EndPoints[0]);
 	return Cast<ATargetPoint>(EndPoints[0]);
 }
 

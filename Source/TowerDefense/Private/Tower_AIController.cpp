@@ -90,6 +90,7 @@ void ATower_AIController::Tick(float DeltaTime)
 
 // if an enemy enters the perception area, it is added in the DetectedPawns TArray
 // when an enemy exits(exits or gets killed) the perception area, it is removed from the DetectedPawns TArray
+// TO BE CHANGED, ENEMIES ARE REMOVED ONLY WHEN NULLPTR, BEFORE SHOOTING THE DISTANCE BETWEEN THE TOWER AND THE ENEMY IS CHECKED 
 void ATower_AIController::OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow)
 {
 	if (isActive)

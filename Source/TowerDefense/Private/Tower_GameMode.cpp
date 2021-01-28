@@ -11,6 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Tower.h"
 #include "GameplayStats.h"
+#include "Engine/Engine.h"
 
 ATower_GameMode::ATower_GameMode() : Super()
 {

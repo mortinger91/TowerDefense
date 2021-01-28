@@ -49,7 +49,6 @@ void AStats_HUD::BeginPlay()
 
 }
 
-
 void AStats_HUD::DrawHUD()
 {
 	Super::DrawHUD();
