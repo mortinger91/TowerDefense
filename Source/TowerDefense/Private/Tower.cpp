@@ -6,10 +6,9 @@
 #include "Cooldown.h"
 #include "Components/StaticMeshComponent.h"
 #include "Tower_GameMode.h"
-#include "GameplayStats.h"
 #include "Tower_AIController.h"
-//#include "Components/CapsuleComponent.h"
 #include "Engine/Engine.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 ATower::ATower()
@@ -17,32 +16,18 @@ ATower::ATower()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
 
-	//TowerCapsule = CreateDefaultSubobject<UCapsuleComponent>("TowerCapsule");
+	// mesh component
 	TowerMesh = CreateDefaultSubobject<UStaticMeshComponent>("TowerMesh");
-	//TowerMesh->SetupAttachment(TowerCapsule);
-	//SetRootComponent(TowerCapsule);
 	SetRootComponent(TowerMesh);
 
-	// component cooldown
+	// cooldown component
 	cooldownShot = CreateDefaultSubobject<UCooldown>("cooldown");
 
-	shiftSock = 35.f;
+	AIControllerClass = ATower_AIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	SetCanAffectNavigationGeneration(true, true);
 
-
-	// GAMEPLAY PARAMETERS
-	towerType = "Cannon";
 	level = 1;
-
-	cooldownShot->maxCooldown = Cannon::shotCooldown;
-	damage1 = Cannon::damage1;
-	damage2 = Cannon::damage2;
-	damage3 = Cannon::damage3;
-	goldToBuild = Cannon::goldToBuild;
-	goldToUpgrade1 = Cannon::goldToUpgrade1;
-	goldToUpgrade2 = Cannon::goldToUpgrade2;
-	goldToSell1 = Cannon::goldToSell1;
-	goldToSell2 = Cannon::goldToSell2;
-	goldToSell3 = Cannon::goldToSell3;
 }
 
 // Called when the game starts or when spawned
@@ -50,11 +35,15 @@ void ATower::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogActor, Warning, TEXT("Spawned tower: type: %s, name: %s"), *towerType, *this->GetName())
+
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
 	{
 		UE_LOG(LogActor, Warning, TEXT("In Tower: Game Mode not found!"))
 	}
+
+	SpawnDefaultController();
 }
 
 // Called every frame
@@ -177,14 +166,13 @@ int32 ATower::GetGoldToBuild()
 	return goldToBuild;
 }
 
+FString ATower::GetTowerType()
+{
+	return towerType;
+}
+
 void ATower::Activate()
 {
-	// added ad hoc for the Tower_Merged_mesh
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket0")) + FVector(shiftSock, 0.f, 0.f) );
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket1")) + FVector(-shiftSock, 0.f, 0.f) );
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket2")) + FVector(0.f, -shiftSock, 0.f) );
-	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket3")) + FVector(0.f, shiftSock, 0.f) );
-
 	Cast<ATower_AIController>(GetController())->ActivateAI();
 }
 
@@ -195,4 +183,12 @@ void ATower::GetActorEyesViewPoint(FVector & Location, FRotator & Rotation) cons
     //Rotation.Yaw -= GetMesh()->GetSocketTransform("head", RTS_ParentBoneSpace).Rotator().Roll;
 }
 
+void ATower::SetCooldown(float cooldown)
+{
+	cooldownShot->maxCooldown = cooldown;
+}
 
+float ATower::GetAISightRadius()
+{
+	return AISightRadius;
+}

@@ -2,17 +2,11 @@
 
 #pragma once
 
-//#include "CoreMinimal.h"
-//
-///**
-// * 
-// */
-//class TOWERDEFENSE_API GameplayStats
-//{
-//public:
-//	GameplayStats();
-//	~GameplayStats();
-//};
+namespace Game
+{
+	const float MaxHealth = 10.f;
+	const int32 MaxGold = 999;
+}
 
 namespace Cannon
 {
@@ -28,4 +22,6 @@ namespace Cannon
 	const int32 goldToSell1 = 5;
 	const int32 goldToSell2 = 10;
 	const int32 goldToSell3 = 20;
+
+	const float AISightRadius = 1200.f;
 }

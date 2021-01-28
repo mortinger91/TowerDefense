@@ -6,9 +6,6 @@
 #include "AIController.h"
 #include "Tower_AIController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class TOWERDEFENSE_API ATower_AIController : public AAIController
 {
@@ -23,28 +20,10 @@ public:
 
 	virtual void Tick (float DeltaTime) override;
 
-	//virtual FRotator GetControlRotation() const override;
-
 	UFUNCTION()
 	void OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-	//float AISightRadius = 800.f;
-	float AISightRadius = 1200.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-	float AISightAge = 0.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-	float AILoseSightRadius = 50.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-	float AIFieldOfView = 360.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
 	class UAISenseConfig_Sight* SightConfig;
-
-	void Shoot(const class AEnemy* enemyToShoot);
 
 	void ActivateAI();
 

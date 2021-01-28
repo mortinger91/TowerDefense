@@ -16,7 +16,6 @@ AStats_HUD::AStats_HUD()
 {
 	static ConstructorHelpers::FClassFinder<UGame_UserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/Game_UI"));
 	HUDWidgetClass = HealthBarObj.Class;
-	
 }
 
 void AStats_HUD::BeginPlay()
@@ -81,7 +80,7 @@ void AStats_HUD::PlayGameOverAnimation()
 
 void AStats_HUD::ShowTowerTooltip()
 {
-	FText TowerType = FText::FromString(FString(TEXT("Type: ")) + GM->selectedTower->towerType);
+	FText TowerType = FText::FromString(FString(TEXT("Type: ")) + GM->selectedTower->GetTowerType());
 	FText Level = FText::FromString(FString(TEXT("Lvl: ")) + FString::FromInt(GM->selectedTower->GetLevel()));
 	FText UpgradeGold = FText::FromString(FString::FromInt(GM->selectedTower->GetGoldToUpgrade()) + FString(TEXT("g")));
 	FText SellGold = FText::FromString(FString::FromInt(GM->selectedTower->GetGoldToSell()) + FString(TEXT("g")));

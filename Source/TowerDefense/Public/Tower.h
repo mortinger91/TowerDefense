@@ -6,7 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "Tower.generated.h"
 
-UCLASS()
+UCLASS(abstract)
 class TOWERDEFENSE_API ATower : public APawn
 {
 	GENERATED_BODY()
@@ -15,17 +15,9 @@ public:
 	// Sets default values for this pawn's properties
 	ATower();
 
-	UPROPERTY(EditAnywhere, Category = "cooldown")
 	class UCooldown* cooldownShot;
 
-	UPROPERTY(EditAnywhere, Category = "Particles")
-	class UParticleSystem* particlesShooting;
-
-	UPROPERTY(EditAnywhere, Category = "Shooting")
-	TSubclassOf<class ABullet> BulletClass;
-
-	// array of sockets, points from where to shoot
-	TArray<FVector> sockets;
+	virtual void Shoot(const AActor* enemyToShoot) PURE_VIRTUAL(ATower::Shoot, return;);
 
 	float GetDamage(); //dipende dal livello
 
@@ -41,28 +33,21 @@ public:
 
 	int32 GetGoldToBuild();
 
-	FString towerType; // il tipo della torre
+	FString GetTowerType();
 
-	void Activate();
+	float GetAISightRadius();
+
+	virtual void Activate();
 
 	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	class ATower_GameMode* GM;
-
-	//UPROPERTY(EditAnywhere, Category = "components")
-	//class UCapsuleComponent* TowerCapsule;
-
 	UPROPERTY(EditAnywhere, Category = "components")
 	UStaticMeshComponent* TowerMesh;
 
-	float shiftSock;
+	void SetCooldown(float cooldown);
+
+	FString towerType; // il tipo della torre
 
 	int32 level;
 
@@ -76,5 +61,15 @@ protected:
 	int32 goldToSell1;
 	int32 goldToSell2;
 	int32 goldToSell3;
+
+	float AISightRadius;
 	
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+private:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	class ATower_GameMode* GM;
 };

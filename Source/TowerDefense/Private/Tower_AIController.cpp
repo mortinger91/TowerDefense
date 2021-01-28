@@ -4,12 +4,10 @@
 #include "Tower_AIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Bullet.h"
 #include "Enemy.h"
 #include "Tower.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Cooldown.h"
-#include "Kismet/GameplayStatics.h"
+#include "GameplayStats.h"
 
 ATower_AIController::ATower_AIController()
 {
@@ -20,10 +18,12 @@ ATower_AIController::ATower_AIController()
 	// component perception sight
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>("Sight Config");
 	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>("Perception Component"));
-	SightConfig->SightRadius = AISightRadius;
-	SightConfig->LoseSightRadius = AISightRadius;
-	SightConfig->PeripheralVisionAngleDegrees = AIFieldOfView;
-	SightConfig->SetMaxAge(AISightAge);
+	//SightConfig->SightRadius = tower->GetAISightRadius();
+	SightConfig->SightRadius = 1200.f;
+	//SightConfig->LoseSightRadius = tower->GetAISightRadius() + 50.f;
+	SightConfig->LoseSightRadius = 1200.f + 50.f;
+	SightConfig->PeripheralVisionAngleDegrees = 360.f;
+	SightConfig->SetMaxAge(0.f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
@@ -40,7 +40,6 @@ void ATower_AIController::BeginPlay()
 	{
 		UE_LOG(LogActor, Warning, TEXT("Perception Component not found!"))
 	}
-	
 }
 
 void ATower_AIController::OnPossess(APawn* MyPawn)
@@ -52,7 +51,22 @@ void ATower_AIController::OnPossess(APawn* MyPawn)
 	{
 		UE_LOG(LogActor, Warning, TEXT("No Tower Pawn found for %s!"), *this->GetName())
 	}
+
+	//// component perception sight
+	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>("Sight Config");
+	//SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>("Perception Component"));
+	//SightConfig->SightRadius = tower->GetAISightRadius();
+	//SightConfig->LoseSightRadius = tower->GetAISightRadius() + 50.f;
+	//SightConfig->PeripheralVisionAngleDegrees = 360.f;
+	//SightConfig->SetMaxAge(0.f);
+	//SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	//SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	//SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	//GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
+	//GetPerceptionComponent()->ConfigureSense(*SightConfig);
+	//GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ATower_AIController::OnPawnDetected);
 }
+
 
 // every frame the tower is checking the cooldown
 // if the shot is not on cooldown, it checks if there are any detected pawns in the DetectedPawns TArray
@@ -81,7 +95,8 @@ void ATower_AIController::Tick(float DeltaTime)
 						index = i;
 					}
 				}
-				Shoot(Cast<AEnemy>(DetectedPawns[index]));
+				//Shoot(Cast<AEnemy>(DetectedPawns[index]));
+				tower->Shoot(Cast<AEnemy>(DetectedPawns[index]));
 				tower->cooldownShot->StartCooldown();
 			}
 		}
@@ -114,54 +129,6 @@ void ATower_AIController::OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow
 				}
 			}
 		}
-	}
-}
-
-void ATower_AIController::Shoot(const AEnemy* enemyToShoot)
-{
-	if (tower->BulletClass != nullptr)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.bNoFail = true;
-		SpawnParams.Owner = tower;
-		SpawnParams.Instigator = tower;
-
-		FTransform BulletSpawnTransform;
-		
-		// atomic
-		FVector enemyLocation;
-		{
-			if (enemyToShoot == nullptr)
-				return;
-			enemyLocation = enemyToShoot->GetActorLocation();
-		}
-
-		float min = FVector::Dist(tower->sockets[0], enemyLocation);
-		int32 socketIndex = 0;
-		if (!(tower->sockets.Num() > 0))
-		{
-			UE_LOG(LogActor, Warning, TEXT("No Tower Sockets found for %s!"), *this->GetName())
-		}
-		for (int32 i = 0; i < tower->sockets.Num(); ++i)
-		{
-			if (FVector::Dist(tower->sockets[i], enemyLocation) < min)
-			{
-				min = FVector::Dist(tower->sockets[i], enemyLocation);
-				socketIndex = i;
-			}
-		}
-		
-		BulletSpawnTransform.SetLocation(tower->sockets[socketIndex]);
-
-		FVector fv = UKismetMathLibrary::InverseTransformLocation(BulletSpawnTransform, enemyLocation);
-		FRotator fr = UKismetMathLibrary::Conv_VectorToRotator(fv);
-		//BulletSpawnTransform.SetRotation(tower->GetActorRotation().Quaternion()); 
-		BulletSpawnTransform.SetRotation(fr.Quaternion()); 
-		BulletSpawnTransform.SetScale3D(FVector(0.8f));
-
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), tower->particlesShooting, BulletSpawnTransform, true, EPSCPoolMethod::None, true);
-		GetWorld()->SpawnActor<ABullet>(tower->BulletClass, BulletSpawnTransform, SpawnParams);
 	}
 }
 

@@ -12,21 +12,21 @@
 #include "Tower.h"
 #include "GameplayStats.h"
 #include "Engine/Engine.h"
+#include "CannonTower.h"
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	selectedTower = nullptr;
-	spawnedTower = nullptr;
+	// STATS
+	MaxHealth = Game::MaxHealth;
+	MaxGold = Game::MaxGold;
 
-	MaxHealth = 10;
 	HealthDamage = 0.0f;
-	MaxGold = 999;
-
 	InitiateGameOver = false;
+	spawnedTower = nullptr;
 	dragMode = false;
-
+	selectedTower = nullptr;
 	MyTimeline = NewObject<UTimelineComponent>(this, FName("Health_Animation"));
 }
 
@@ -201,20 +201,18 @@ void ATower_GameMode::SellSelectedTower()
 
 void ATower_GameMode::SpawnTower(FString towerType)
 {
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
+
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.bNoFail = true;
-	//SpawnParams.Owner = this;
-
-	FTransform SpawnTransform;
-	//SpawnTransform.SetLocation(FVector(200.f,600.f,200.f));
-	SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
 
 	if (towerType == "Cannon")
 	{
 		if (GoldAvailable(Cannon::goldToBuild))
 		{
-			spawnedTower = GetWorld()->SpawnActor<ATower>(CannonTower, SpawnTransform, SpawnParams);
+			spawnedTower = GetWorld()->SpawnActor<ACannonTower>(CannonTowerClass, SpawnTransform, SpawnParams);
 			dragMode = true;
 		}
 		else

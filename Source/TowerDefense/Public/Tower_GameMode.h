@@ -23,61 +23,45 @@ class TOWERDEFENSE_API ATower_GameMode : public AGameModeBase
 public:
 	ATower_GameMode();
 
-	virtual void BeginPlay() override;
-
-	virtual void Tick (float DeltaTime) override;
-
-	// health bar
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	// STATS
 	float MaxHealth;
+	int32 MaxGold;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	// HEALTH
 	float PreviousHealth;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float HealthDamage;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	UCurveFloat* HealthCurve;
-
 	float CurveFloatValue;
 	float TimelineValue;
 	class UTimelineComponent* MyTimeline;
 
+	// HUD
+	// player hud, update gold count when enemy dies
+	class AStats_HUD * HudWidgetPlayer;
 	UFUNCTION()
 	void SetHealth();
-
 	void Remove1Health();
-
-	// max gold
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gold")
-	int32 MaxGold;
-
 	void UpdateGold(float gold);
-
 	bool GoldAvailable(int32 GoldToCheck);
-
 	// Handle any function calls that rely upon changing the playing state of our game
 	void ChangeGamePlayState(EGamePlayState NewState);
 
+	// SELECTING TOWERS
 	class ATower * selectedTower;
-
 	void LevelUpSelectedTower();
 	void SellSelectedTower();
 
-	// player hud, update gold count when enemy dies
-	class AStats_HUD * HudWidgetPlayer;
-
-	bool dragMode;
-
-	void SpawnTower(FString towerType);
-
+	// SPAWNING TOWERS
 	class ATower * spawnedTower;
-
+	bool dragMode;
+	void SpawnTower(FString towerType);
 	void FinalizeTowerSpawn(); 
 
 private:
-	//TArray<FVector> EndPointPosition;
+	virtual void BeginPlay() override;
+
+	virtual void Tick (float DeltaTime) override;
 
 	class ATower_GameState* GS;
 	
@@ -89,8 +73,7 @@ private:
 
 	bool InitiateGameOver;
 
-	UPROPERTY(EditAnywhere, Category = "Spawning")
-	//TSubclassOf<class ATower> CannonTower;
-	TSubclassOf<class AActor> CannonTower;
-
+	UPROPERTY(EditAnywhere, Category = "Tower Types Blueprint")
+	TSubclassOf<class ACannonTower> CannonTowerClass;
+	
 };
