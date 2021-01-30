@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "Stats_HUD.generated.h"
+#include "Game_HUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TOWERDEFENSE_API AStats_HUD : public AHUD
+class TOWERDEFENSE_API AGame_HUD : public AHUD
 {
 	GENERATED_BODY()
 	
 public:
-	AStats_HUD();
+	AGame_HUD();
 	
 	void UpdateHealthText(FText NewHealthText);
 

@@ -4,8 +4,21 @@
 
 namespace Game
 {
-	const float MaxHealth = 10.f;
-	const int32 MaxGold = 999;
+	const float maxHealth = 10.f;
+	const int32 startingGold = 20;
+	const int32 maxGold = 999;
+}
+
+namespace Spawn
+{
+	const float spawnCooldown = 1.f;
+}
+
+namespace Enemy
+{
+	const float walkSpeed = 600.f;
+	const float baseHealth = 100.f;
+	const float gold = 1.f;
 }
 
 namespace Cannon

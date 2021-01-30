@@ -3,7 +3,7 @@
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"
-#include "Stats_HUD.h"
+#include "Game_HUD.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
@@ -13,14 +13,15 @@
 #include "GameplayStats.h"
 #include "Engine/Engine.h"
 #include "CannonTower.h"
+#include "TowerBase.h"
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	// STATS
-	MaxHealth = Game::MaxHealth;
-	MaxGold = Game::MaxGold;
+	MaxHealth = Game::maxHealth;
+	MaxGold = Game::maxGold;
 
 	HealthDamage = 0.0f;
 	InitiateGameOver = false;
@@ -48,7 +49,7 @@ void ATower_GameMode::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("HealthCurve not found!"))
 	}
 
-	HudWidgetPlayer = Cast<AStats_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	HudWidgetPlayer = Cast<AGame_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (HudWidgetPlayer == nullptr)
 	{
 		UE_LOG(LogActor, Warning, TEXT("HUD Widget not found!"))
@@ -64,8 +65,7 @@ void ATower_GameMode::BeginPlay()
     MyTimeline->AddInterpFloat(HealthCurve, TimelineCallback);
 	MyTimeline->RegisterComponent();
 
-	// errore all'avvio
-	//HudWidgetPlayer->UpdateGoldText(GS->Gold);
+	ShowUnusedTowerBases(true);
 }
 
 // Called every frame
@@ -75,20 +75,7 @@ void ATower_GameMode::Tick(float DeltaTime)
 
 	if (MyTimeline != nullptr) MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
 
-	if (dragMode)
-	{
-		FVector mouseLocation;
-		FVector mouseDirection;
-		GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
-		
-		FHitResult OutHit;
-		FVector Start = mouseLocation;
-		FVector End = mouseLocation + mouseDirection*10000;
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(spawnedTower);
-		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic, CollisionParams);
-		spawnedTower->SetActorLocation(OutHit.Location);
-	}
+
 }
 
 void ATower_GameMode::Remove1Health()
@@ -196,9 +183,11 @@ void ATower_GameMode::LevelUpSelectedTower()
 void ATower_GameMode::SellSelectedTower()
 {
 	selectedTower->Sell();
+	selectedTower->GetTowerBase()->used = false;
 	HudWidgetPlayer->HideTowerTooltip();
 }
 
+// called from Game_HUD "SpawnTower***Action" when clicking tower button on Game_UI
 void ATower_GameMode::SpawnTower(FString towerType)
 {
 	FTransform SpawnTransform;
@@ -214,6 +203,7 @@ void ATower_GameMode::SpawnTower(FString towerType)
 		{
 			spawnedTower = GetWorld()->SpawnActor<ACannonTower>(CannonTowerClass, SpawnTransform, SpawnParams);
 			dragMode = true;
+			ShowUnusedTowerBases(false);
 		}
 		else
 		{
@@ -228,15 +218,40 @@ void ATower_GameMode::SpawnTower(FString towerType)
 
 void ATower_GameMode::FinalizeTowerSpawn()
 {
-	dragMode = false;
 	// check tower position
 	// if not ok, destroy tower
-	UpdateGold(-spawnedTower->GetGoldToBuild());
-	spawnedTower->Activate();
+	if (selectedBase != nullptr && !selectedBase->used)
+	{
+		//selectedBase->SetActorHiddenInGame(true);
+		ShowUnusedTowerBases(true);
+		selectedBase->used = true;
+		UpdateGold(-spawnedTower->GetGoldToBuild());
+		spawnedTower->Activate();
+		spawnedTower->SetTowerBase(selectedBase);
+	}
+	else
+	{
+		spawnedTower->Destroy();
+	}
+	dragMode = false;
+	selectedBase = nullptr;
 	spawnedTower = nullptr;
 }
 
 void ATower_GameMode::GoToMainMenu()
 {
 	UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Tower_Defense/Levels/StartMenuLevel")));
+}
+
+void ATower_GameMode::ShowUnusedTowerBases(bool toHide)
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATowerBase::StaticClass(), FoundActors);
+	for (int i = 0; i < FoundActors.Num(); ++i)
+	{
+		if (!Cast<ATowerBase>(FoundActors[i])->used)
+		{
+			Cast<ATowerBase>(FoundActors[i])->SetActorHiddenInGame(toHide);
+		}
+	}
 }

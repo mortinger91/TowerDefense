@@ -41,8 +41,13 @@ public:
 
 	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
 
+	FVector towerPosition;
+
+	void SetTowerBase(class ATowerBase* towerBaseToSet);
+	class ATowerBase* GetTowerBase();
+
 protected:
-	UPROPERTY(EditAnywhere, Category = "components")
+	UPROPERTY(EditAnywhere, Category = "Static Mesh Component")
 	UStaticMeshComponent* TowerMesh;
 
 	void SetCooldown(float cooldown);
@@ -72,4 +77,6 @@ private:
 	virtual void Tick(float DeltaTime) override;
 
 	class ATower_GameMode* GM;
+
+	class ATowerBase* towerBase;
 };

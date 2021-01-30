@@ -36,7 +36,7 @@ private:
 
 	void ClickAction();
 
-	void ReleaseAction();
+	//void ReleaseAction();
 	
 	//UPROPERTY(EditAnywhere, Category = "Stats")
 	//class UUserWidget * CursorWidgetClass;

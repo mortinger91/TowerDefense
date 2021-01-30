@@ -26,6 +26,21 @@ ACannonTower::ACannonTower()
 	AISightRadius = Cannon::AISightRadius;
 }
 
+void ACannonTower::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (BulletClass == nullptr)
+	{
+		UE_LOG(LogActor, Warning, TEXT("In CannonTower: BulletClass not found!"))
+	}
+
+	if (!(sockets.Num() > 0))
+	{
+		UE_LOG(LogActor, Warning, TEXT("No Tower Sockets found for %s!"), *this->GetName())
+	}
+}
+
 void ACannonTower::Activate()
 {
 	// added ad hoc for the Tower_Merged_mesh
@@ -39,53 +54,39 @@ void ACannonTower::Activate()
 
 void ACannonTower::Shoot(const AActor* enemyToShoot)
 {
-	if (BulletClass != nullptr)
+	// get closest cannon to enemy location
+	FVector enemyLocation;
 	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.bNoFail = true;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = this;
-
-		FTransform BulletSpawnTransform;
-		
-		// atomic
-		FVector enemyLocation;
-		{
-			if (enemyToShoot == nullptr)
-				return;
-			enemyLocation = enemyToShoot->GetActorLocation();
-		}
-
-		float min = FVector::Dist(sockets[0], enemyLocation);
-		int32 socketIndex = 0;
-		if (!(sockets.Num() > 0))
-		{
-			UE_LOG(LogActor, Warning, TEXT("No Tower Sockets found for %s!"), *this->GetName())
-		}
-		for (int32 i = 0; i < sockets.Num(); ++i)
-		{
-			if (FVector::Dist(sockets[i], enemyLocation) < min)
-			{
-				min = FVector::Dist(sockets[i], enemyLocation);
-				socketIndex = i;
-			}
-		}
-		
-		BulletSpawnTransform.SetLocation(sockets[socketIndex]);
-
-		FVector fv = UKismetMathLibrary::InverseTransformLocation(BulletSpawnTransform, enemyLocation);
-		FRotator fr = UKismetMathLibrary::Conv_VectorToRotator(fv);
-		//BulletSpawnTransform.SetRotation(tower->GetActorRotation().Quaternion()); 
-		BulletSpawnTransform.SetRotation(fr.Quaternion()); 
-		BulletSpawnTransform.SetScale3D(FVector(0.8f));
-
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particlesShooting, BulletSpawnTransform, true, EPSCPoolMethod::None, true);
-		GetWorld()->SpawnActor<ABullet>(BulletClass, BulletSpawnTransform, SpawnParams);
+		if (enemyToShoot == nullptr)
+			return;
+		enemyLocation = enemyToShoot->GetActorLocation();
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Shooting enemy: %s, location: %f %f %f"), *enemyToShoot->GetName(), enemyLocation.X, enemyLocation.Y, enemyLocation.Z ));
 	}
+	float min = FVector::Dist(sockets[0], enemyLocation);
+	int32 socketIndex = 0;
+	for (int32 i = 0; i < sockets.Num(); ++i)
+	{
+		if (FVector::Dist(sockets[i], enemyLocation) < min)
+		{
+			min = FVector::Dist(sockets[i], enemyLocation);
+			socketIndex = i;
+		}
+	}
+		
+	FActorSpawnParameters BulletSpawnParams;
+	BulletSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	BulletSpawnParams.bNoFail = true;
+	BulletSpawnParams.Owner = this;
+	BulletSpawnParams.Instigator = this;
+
+	FTransform BulletSpawnTransform;
+	BulletSpawnTransform.SetLocation(sockets[socketIndex]);
+	FVector fv = UKismetMathLibrary::InverseTransformLocation(BulletSpawnTransform, enemyLocation);
+	FRotator fr = UKismetMathLibrary::Conv_VectorToRotator(fv);
+	BulletSpawnTransform.SetRotation(fr.Quaternion()); 
+	BulletSpawnTransform.SetScale3D(FVector(0.8f));
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particlesShooting, BulletSpawnTransform, true, EPSCPoolMethod::None, true);
+	GetWorld()->SpawnActor<ABullet>(BulletClass, BulletSpawnTransform, BulletSpawnParams);
 }
 
-//void ACannonTower::BeginPlay()
-//{
-//	Super::BeginPlay();
-//}

@@ -7,30 +7,22 @@
 #include "CustomPawn.h"
 #include "Tower.h"
 #include "Tower_GameMode.h"
-#include "Stats_HUD.h"
+#include "Game_HUD.h"
 #include "Engine/World.h"
 //#include "DrawDebugHelpers.h"
-
-//#include "GenericPlatform/ICursor.h"
-//#include "Blueprint/UserWidget.h"
-//#include "UObject/ConstructorHelpers.h"
+#include "TowerBase.h"
 
 ATower_PlayerController::ATower_PlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	//GetHitResultUnderCursorByChannel
-	
-	//GetHitResultUnderCursorByChannel
-	//PlayerInput->
-
-	//static ConstructorHelpers::FClassFinder<UUserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/DefaultCursor"));
-	//CursorWidgetClass = Cast<UUserWidget>(HealthBarObj.Class);
 }
 
 void ATower_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ConsoleCommand(FString("t.MaxFPS = 60"), false);
 
 	FInputModeGameAndUI data;
 	data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
@@ -53,6 +45,32 @@ void ATower_PlayerController::BeginPlay()
 void ATower_PlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GM->dragMode)
+	{
+		FVector mouseLocation;
+		FVector mouseDirection;
+		//GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+		DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+		
+		FHitResult OutHit;
+		FVector Start = mouseLocation;
+		FVector End = mouseLocation + mouseDirection*10000;
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(GM->spawnedTower);
+		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic, CollisionParams);
+		if (OutHit.GetActor()->IsA(ATowerBase::StaticClass()))
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Tower onto base: %s"), *OutHit.GetActor()->GetName()));
+			GM->spawnedTower->SetActorLocation(OutHit.GetActor()->GetActorLocation());
+			GM->selectedBase = Cast<ATowerBase>(OutHit.GetActor());
+		}
+		else
+		{
+			GM->spawnedTower->SetActorLocation(OutHit.Location);
+			GM->selectedBase = nullptr;
+		}
+	}
 }
 
 void ATower_PlayerController::SetupInputComponent()
@@ -60,7 +78,7 @@ void ATower_PlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("LeftMouseClick", IE_Pressed, this, &ATower_PlayerController::ClickAction);
-	InputComponent->BindAction("LeftMouseClick", IE_Released, this, &ATower_PlayerController::ReleaseAction);
+	//InputComponent->BindAction("LeftMouseClick", IE_Released, this, &ATower_PlayerController::ReleaseAction);
 
 	InputComponent->BindAxis("MoveForward", this, &ATower_PlayerController::MoveForward); 
 	InputComponent->BindAxis("MoveRight", this, &ATower_PlayerController::MoveRight);
@@ -90,8 +108,6 @@ void ATower_PlayerController::LookUp(float Amount)
 
 void ATower_PlayerController::ClickAction()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Click Pressed")));
-
 	// DEBUG DRAW LINE ON CLICK
 		//FVector mouseLocation;
 		//FVector mouseDirection;
@@ -113,7 +129,6 @@ void ATower_PlayerController::ClickAction()
 		{
 			GM->selectedTower = tower;
 			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Tower Actor: %s"), *GM->selectedTower->GetName()));
-
 			GM->HudWidgetPlayer->ShowTowerTooltip();
 		} else
 		{
@@ -123,11 +138,7 @@ void ATower_PlayerController::ClickAction()
 	}
 }
 
-void ATower_PlayerController::ReleaseAction()
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Click Released")));
-	//if (GM->dragMode)
-	//{
-	//	GM->FinalizeTowerSpawn();
-	//}
-}
+//void ATower_PlayerController::ReleaseAction()
+//{
+//
+//}

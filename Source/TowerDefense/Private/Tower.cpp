@@ -9,6 +9,7 @@
 #include "Tower_AIController.h"
 #include "Engine/Engine.h"
 #include "UObject/ConstructorHelpers.h"
+#include "TowerBase.h"
 
 // Sets default values
 ATower::ATower()
@@ -27,6 +28,7 @@ ATower::ATower()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	SetCanAffectNavigationGeneration(true, true);
 
+	towerBase = nullptr;
 	level = 1;
 }
 
@@ -173,6 +175,7 @@ FString ATower::GetTowerType()
 
 void ATower::Activate()
 {
+	towerPosition = GetActorLocation();
 	Cast<ATower_AIController>(GetController())->ActivateAI();
 }
 
@@ -191,4 +194,14 @@ void ATower::SetCooldown(float cooldown)
 float ATower::GetAISightRadius()
 {
 	return AISightRadius;
+}
+
+void ATower::SetTowerBase(ATowerBase* towerBaseToSet)
+{
+	towerBase = towerBaseToSet;
+}
+
+ATowerBase* ATower::GetTowerBase()
+{
+	return towerBase;
 }

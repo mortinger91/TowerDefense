@@ -4,10 +4,11 @@
 #include "Tower_GameState.h"
 #include "Tower_GameMode.h"
 #include "Engine/World.h"
+#include "GameplayStats.h"
 
 ATower_GameState::ATower_GameState()
 {
-	Gold = 20;
+	Gold = Game::startingGold;
 	HealthPercentage = 1.f; 
 }
 
@@ -29,7 +30,7 @@ float ATower_GameState::GetHealthPercentage()
 
 FText ATower_GameState::GetHealthText()
 {
-	FString HP = FString::FromInt(Health);// + FString(TEXT("/") + FString::FromInt(GM->MaxHealth));
+	FString HP = FString::FromInt(Health);
 	FText HPText = FText::FromString(HP);
 	return HPText;
 }

@@ -27,10 +27,12 @@ public:
 
 	void ActivateAI();
 
-protected:
+private:
 	class ATower* tower;
 
-	TArray<AActor*> DetectedPawns;
+	TArray<class AEnemy*> DetectedEnemies;
 
 	bool isActive;
+
+	bool IsValid(UObject* Obj);
 };

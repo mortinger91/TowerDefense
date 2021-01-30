@@ -19,10 +19,9 @@ public:
 	void Shoot(const AActor* enemyToShoot) override;
 
 private:
-	//// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-	// array of sockets, points from where to shoot
+	// array of sockets, points from where to shoot (cannons)
 	TArray<FVector> sockets;
 
 	float shiftSock;

@@ -10,6 +10,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "Engine/World.h"
+#include "GameplayStats.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -30,21 +31,22 @@ AEnemy::AEnemy()
 
 	HealthWidgetComponent->SetRelativeLocation(FVector(10.f, 0.f, 50.f));
 	HealthWidgetComponent->SetDrawSize(FVector2D(60.f, 15.f));
-
-	// servono?
-	GetCharacterMovement()->bUseRVOAvoidance = true;
-	GetCharacterMovement()->AvoidanceWeight = 0.5f;
-	//GetCharacterMovement()->bOrientRotationToMovement = false;
-	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	//this->bUseControllerRotationYaw = false;
-	//GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
-
-	
-	// stats
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
-	maxHealth = 100.f;
-	gold = 1.f;
+	iAmDestroyed = false;
+
+	// SERVONO?
+		GetCharacterMovement()->bUseRVOAvoidance = true;
+		GetCharacterMovement()->AvoidanceWeight = 0.5f;
+		//GetCharacterMovement()->bOrientRotationToMovement = false;
+		//GetCharacterMovement()->bUseControllerDesiredRotation = true;
+		//this->bUseControllerRotationYaw = false;
+		//GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
+
+	// STATS
+	GetCharacterMovement()->MaxWalkSpeed = Enemy::walkSpeed;
+	maxHealth = Enemy::baseHealth;
+	gold = Enemy::gold;
+
 }
 
 // Called when the game starts or when spawned
@@ -101,25 +103,12 @@ void AEnemy::GetDamaged(float damage)
 
 	if (health <= 0)
 	{
+		iAmDestroyed = true;
+
 		GM->UpdateGold(gold);
 
 		Destroy();
-
-		//if (DeathActor != nullptr)
-		//{
-		//	FActorSpawnParameters SpawnParams;
-		//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		//	SpawnParams.bNoFail = true;
-		//	SpawnParams.Owner = this;
-		//	SpawnParams.Instigator = this;
-
-		//	FTransform BulletSpawnTransform;
-		//	BulletSpawnTransform.SetLocation(GetActorForwardVector() + GetActorLocation());
-		//	BulletSpawnTransform.SetRotation(GetActorRotation().Quaternion());
-		//	BulletSpawnTransform.SetScale3D(FVector(1.f));
-
-		//	GetWorld()->SpawnActor<AEnemyDeath>(DeathActor, BulletSpawnTransform, SpawnParams);
-		//}
 	}
 }
+
 

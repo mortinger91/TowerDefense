@@ -38,7 +38,7 @@ public:
 
 	// HUD
 	// player hud, update gold count when enemy dies
-	class AStats_HUD * HudWidgetPlayer;
+	class AGame_HUD * HudWidgetPlayer;
 	UFUNCTION()
 	void SetHealth();
 	void Remove1Health();
@@ -54,6 +54,7 @@ public:
 
 	// SPAWNING TOWERS
 	class ATower * spawnedTower;
+	class ATowerBase* selectedBase;
 	bool dragMode;
 	void SpawnTower(FString towerType);
 	void FinalizeTowerSpawn(); 
@@ -75,5 +76,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Tower Types Blueprint")
 	TSubclassOf<class ACannonTower> CannonTowerClass;
+
+	void ShowUnusedTowerBases(bool toHide);
 	
 };

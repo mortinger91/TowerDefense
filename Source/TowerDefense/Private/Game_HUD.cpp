@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Stats_HUD.h"
+#include "Game_HUD.h"
 #include "Tower_GameMode.h"
 #include "Game_UserWidget.h"
 #include "Blueprint/UserWidget.h"
@@ -12,13 +12,13 @@
 #include "Components/Image.h"
 #include "Tower.h"
 
-AStats_HUD::AStats_HUD()
+AGame_HUD::AGame_HUD()
 {
 	static ConstructorHelpers::FClassFinder<UGame_UserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/Game_UI"));
 	HUDWidgetClass = HealthBarObj.Class;
 }
 
-void AStats_HUD::BeginPlay()
+void AGame_HUD::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -35,33 +35,33 @@ void AStats_HUD::BeginPlay()
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
 	{
-		UE_LOG(LogActor, Warning, TEXT("In Stats_HUD: Game Mode not found!"))
+		UE_LOG(LogActor, Warning, TEXT("In Game_HUD: Game Mode not found!"))
 	}
 
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("QuitGame_Button")))->OnClicked.AddDynamic(this, &AStats_HUD::QuitGameAction);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("QuitGame_Button")))->OnClicked.AddDynamic(this, &AGame_HUD::QuitGameAction);
 
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->OnClicked.AddDynamic(this, &AStats_HUD::LevelUpAction);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->OnClicked.AddDynamic(this, &AGame_HUD::LevelUpAction);
 
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellButton")))->OnClicked.AddDynamic(this, &AStats_HUD::SellAction);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellButton")))->OnClicked.AddDynamic(this, &AGame_HUD::SellAction);
 
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnClicked.AddDynamic(this, &AStats_HUD::SpawnTowerCannonAction);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnClicked.AddDynamic(this, &AGame_HUD::SpawnTowerCannonAction);
 
 }
 
-void AStats_HUD::DrawHUD()
+void AGame_HUD::DrawHUD()
 {
 	Super::DrawHUD();
 
 }
 
 // update the health text in the player hud
-void AStats_HUD::UpdateHealthText(FText NewHealthText)
+void AGame_HUD::UpdateHealthText(FText NewHealthText)
 {
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Health_Current")))->SetText(NewHealthText);
 }
 
 // update the gold count in the player hud
-void AStats_HUD::UpdateGoldText(int32 NewGoldCount)
+void AGame_HUD::UpdateGoldText(int32 NewGoldCount)
 {
 	FString G = FString::FromInt(NewGoldCount);
 	FText GText = FText::FromString(G);
@@ -70,7 +70,7 @@ void AStats_HUD::UpdateGoldText(int32 NewGoldCount)
 }
 
 // game over animation, called in game mode when gameover state is set
-void AStats_HUD::PlayGameOverAnimation()
+void AGame_HUD::PlayGameOverAnimation()
 {
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("GAME_OVER_Text")))->SetVisibility(ESlateVisibility::Visible);
 
@@ -78,7 +78,7 @@ void AStats_HUD::PlayGameOverAnimation()
 	GameUIWidget->PlayAnimation(anim);
 }
 
-void AStats_HUD::ShowTowerTooltip()
+void AGame_HUD::ShowTowerTooltip()
 {
 	FText TowerType = FText::FromString(FString(TEXT("Type: ")) + GM->selectedTower->GetTowerType());
 	FText Level = FText::FromString(FString(TEXT("Lvl: ")) + FString::FromInt(GM->selectedTower->GetLevel()));
@@ -105,7 +105,7 @@ void AStats_HUD::ShowTowerTooltip()
 	}
 }
 
-void AStats_HUD::HideTowerTooltip()
+void AGame_HUD::HideTowerTooltip()
 {
 	Cast<UImage>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Background")))->SetVisibility(ESlateVisibility::Hidden);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetVisibility(ESlateVisibility::Hidden);
@@ -116,22 +116,22 @@ void AStats_HUD::HideTowerTooltip()
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellGold")))->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void AStats_HUD::QuitGameAction()
+void AGame_HUD::QuitGameAction()
 {
 	GM->ChangeGamePlayState(EGamePlayState::EGameOver);
 }
 
-void AStats_HUD::LevelUpAction()
+void AGame_HUD::LevelUpAction()
 {
 	GM->LevelUpSelectedTower();
 }
 
-void AStats_HUD::SellAction()
+void AGame_HUD::SellAction()
 {
 	GM->SellSelectedTower();
 }
 
-void AStats_HUD::SpawnTowerCannonAction()
+void AGame_HUD::SpawnTowerCannonAction()
 {
 	GM->SpawnTower("Cannon");
 }

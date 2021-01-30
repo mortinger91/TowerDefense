@@ -23,6 +23,8 @@ public:
 
 	void GetDamaged(float damage);
 
+	bool iAmDestroyed;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystemComponent* Particles;
@@ -46,4 +48,7 @@ protected:
 	class ATower_GameMode * GM;
 
 	void UpdateEnemyHealth();
+
+private:
+
 };
