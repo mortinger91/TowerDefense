@@ -1,8 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Unreal Engine 4 Tower Defense
 
 
 #include "SpawnPoint.h"
-#include "Enemy.h"
+#include "Ninja.h"
 #include "Cooldown.h"
 #include "GameplayStats.h"
 
@@ -23,9 +23,9 @@ void ASpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (EnemyClass != nullptr)
+	if (NinjaClass != nullptr)
 	{
-		UE_LOG(LogActor, Warning, TEXT("In SpawnPoint: EnemyClass not found!"))
+		UE_LOG(LogActor, Warning, TEXT("In SpawnPoint: NinjaClass not found!"))
 	}
 
 }
@@ -38,7 +38,7 @@ void ASpawnPoint::Tick(float DeltaTime)
 	if (cooldown->IsNotCooldown())
 	{
 		cooldown->StartCooldown();
-		SpawnEnemy("soldier");
+		SpawnEnemy("Ninja");
 	}
 }
 
@@ -54,7 +54,10 @@ void ASpawnPoint::SpawnEnemy(FString enemyType)
 	EnemySpawnTransform.SetRotation(GetActorRotation().Quaternion());
 	EnemySpawnTransform.SetScale3D(FVector(1.f));
 
-	GetWorld()->SpawnActor<AEnemy>(EnemyClass, EnemySpawnTransform, SpawnParams);
+	if (enemyType == "Ninja")
+	{
+		GetWorld()->SpawnActor<ANinja>(NinjaClass, EnemySpawnTransform, SpawnParams);
+	}
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Spawned an enemy!")));
 }

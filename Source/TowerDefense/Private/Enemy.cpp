@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Unreal Engine 4 Tower Defense
 //#pragma optimize("", off)
 
 #include "Enemy.h"
@@ -10,7 +10,6 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "Engine/World.h"
-#include "GameplayStats.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -28,38 +27,28 @@ AEnemy::AEnemy()
 	HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	HealthWidgetComponent->AttachToComponent(RootComponent, rules);
 	HealthWidgetComponent->SetWidgetClass(HUDWidgetClass);
+	
+	AIControllerClass = AEnemy_AIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	HealthWidgetComponent->SetRelativeLocation(FVector(10.f, 0.f, 50.f));
-	HealthWidgetComponent->SetDrawSize(FVector2D(60.f, 15.f));
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	iAmDestroyed = false;
+	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	GetCharacterMovement()->DefaultLandMovementMode = EMovementMode::MOVE_NavWalking;
+	bUseControllerRotationYaw = false;
 
 	// SERVONO?
-		GetCharacterMovement()->bUseRVOAvoidance = true;
-		GetCharacterMovement()->AvoidanceWeight = 0.5f;
-		//GetCharacterMovement()->bOrientRotationToMovement = false;
-		//GetCharacterMovement()->bUseControllerDesiredRotation = true;
-		//this->bUseControllerRotationYaw = false;
-		//GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
+		//GetCharacterMovement()->bUseRVOAvoidance = true;
+		//GetCharacterMovement()->AvoidanceConsiderationRadius = 150.f;
+		//GetCharacterMovement()->bCanWalkOffLedges = false;
+		//GetCharacterMovement()->AvoidanceWeight = 0.5f;
 
-	// STATS
-	GetCharacterMovement()->MaxWalkSpeed = Enemy::walkSpeed;
-	maxHealth = Enemy::baseHealth;
-	gold = Enemy::gold;
-
+	iAmDestroyed = false;
 }
 
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ogni 30 secondi il moltiplicatore aumenta di 0.5
-	float healthMultiplier = 1.f + int32(GetWorld()->GetRealTimeSeconds() / 30) * 0.5f;
-
-	maxHealth *= healthMultiplier;
-	UE_LOG(LogActor, Warning, TEXT("Spawned Enemy with health: %f at time: %f"), maxHealth, GetWorld()->GetRealTimeSeconds())
-	health = maxHealth;
 
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
@@ -90,16 +79,10 @@ void AEnemy::Tick(float DeltaTime)
 
 }
 
-void AEnemy::UpdateEnemyHealth()
-{
-	float perc = health/maxHealth;
-	Cast<UProgressBar>(HealthWidgetEnemy->GetWidgetFromName(FName("Health_Bar")))->SetPercent(perc);
-}
-
 void AEnemy::GetDamaged(float damage)
 {
 	health -= damage;
-	UpdateEnemyHealth();
+	Cast<UProgressBar>(HealthWidgetEnemy->GetWidgetFromName(FName("Health_Bar")))->SetPercent(health/maxHealth);
 
 	if (health <= 0)
 	{

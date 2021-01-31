@@ -14,7 +14,7 @@ namespace Spawn
 	const float spawnCooldown = 1.f;
 }
 
-namespace Enemy
+namespace Ninja
 {
 	const float walkSpeed = 600.f;
 	const float baseHealth = 100.f;

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Unreal Engine 4 Tower Defense
 
 using UnrealBuildTool;
 

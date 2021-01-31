@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Unreal Engine 4 Tower Defense
 
 #pragma once
 
@@ -15,10 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	ASpawnPoint();
 
-	//UPROPERTY(EditAnywhere, Category = "components")
-	//UStaticMeshComponent* SpawnMesh;
-
-	UPROPERTY(EditAnywhere, Category = "cooldown")
 	class UCooldown* cooldown;
 
 	// Called every frame
@@ -31,8 +27,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "EnemySpawn")
-	TSubclassOf<class AEnemy> EnemyClass;
-
-	//class ATower_GameMode * GM;
+	TSubclassOf<class ANinja> NinjaClass;
 
 };

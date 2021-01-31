@@ -59,7 +59,7 @@ void ATower_PlayerController::Tick(float DeltaTime)
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(GM->spawnedTower);
 		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic, CollisionParams);
-		if (OutHit.GetActor()->IsA(ATowerBase::StaticClass()))
+		if (OutHit.GetActor() != nullptr && OutHit.GetActor()->IsA(ATowerBase::StaticClass()))
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Tower onto base: %s"), *OutHit.GetActor()->GetName()));
 			GM->spawnedTower->SetActorLocation(OutHit.GetActor()->GetActorLocation());

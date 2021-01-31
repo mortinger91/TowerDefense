@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Unreal Engine 4 Tower Defense
 
 #pragma once
 
@@ -29,16 +29,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystemComponent* Particles;
 
-	UPROPERTY(EditAnywhere, Category = "Stats")
 	float maxHealth;
-
-	UPROPERTY(EditAnywhere, Category = "Stats")
 	float gold;
-
 	float health;
 	
 	// health bar widget component
-	UPROPERTY(EditAnywhere, Category = "Widget")
 	class UWidgetComponent* HealthWidgetComponent;
 	TSubclassOf<class UUserWidget> HUDWidgetClass;
 	UUserWidget * HealthWidgetEnemy;
@@ -46,9 +41,5 @@ protected:
 	class AEnemy_AIController* ai;
 
 	class ATower_GameMode * GM;
-
-	void UpdateEnemyHealth();
-
-private:
 
 };
