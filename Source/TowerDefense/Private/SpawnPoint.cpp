@@ -1,21 +1,23 @@
 // Unreal Engine 4 Tower Defense
-
+// #pragma optimize("", off)
 
 #include "SpawnPoint.h"
 #include "Ninja.h"
 #include "Cooldown.h"
 #include "GameplayStats.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
 
 // Sets default values
 ASpawnPoint::ASpawnPoint()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	cooldown = CreateDefaultSubobject<UCooldown>("cooldown");
 
 	cooldown->maxCooldown = Spawn::spawnCooldown;
 
+	toWait = true;
 }
 
 // Called when the game starts or when spawned
@@ -28,6 +30,18 @@ void ASpawnPoint::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In SpawnPoint: NinjaClass not found!"))
 	}
 
+	FTimerDelegate TimerDel;
+	FTimerHandle TimerHandle;
+
+	TimerDel.BindUFunction(this, FName("StartSpawning"));
+	//Calling RestoreMoveSpeed after "time" seconds without looping
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 5.f, false);
+
+}
+
+void ASpawnPoint::StartSpawning()
+{
+	toWait = false;
 }
 
 // Called every frame
@@ -35,10 +49,13 @@ void ASpawnPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (cooldown->IsNotCooldown())
+	if (!toWait)
 	{
-		cooldown->StartCooldown();
-		SpawnEnemy("Ninja");
+		if(cooldown->IsNotCooldown())
+		{
+			cooldown->StartCooldown();
+			SpawnEnemy("Ninja");
+		}
 	}
 }
 

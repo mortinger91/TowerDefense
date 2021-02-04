@@ -36,7 +36,11 @@ private:
 
 	void ClickAction();
 
-	//void ReleaseAction();
+	void ReleaseAction();
+
+	void TouchClickAction();
+
+	void TouchReleaseAction();
 	
 	//UPROPERTY(EditAnywhere, Category = "Stats")
 	//class UUserWidget * CursorWidgetClass;

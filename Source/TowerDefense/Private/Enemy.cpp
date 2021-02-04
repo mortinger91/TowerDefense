@@ -1,15 +1,16 @@
 // Unreal Engine 4 Tower Defense
-//#pragma optimize("", off)
+// #pragma optimize("", off)
 
 #include "Enemy.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Enemy_AIController.h"
-#include "AIController.h"
 #include "Tower_GameMode.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "Engine/World.h"
+#include "UObject/ConstructorHelpers.h"
+#include "TimerManager.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -49,6 +50,8 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Particles->Deactivate();
 
 	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GM == nullptr)
@@ -92,6 +95,27 @@ void AEnemy::GetDamaged(float damage)
 
 		Destroy();
 	}
+}
+
+void AEnemy::GetSlowed(float slow, float time)
+{
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed - (walkSpeed*slow)/100;
+	Particles->Activate();
+
+	FTimerDelegate TimerDel;
+	FTimerHandle TimerHandle;
+
+	//Binding the function with specific variables
+	//TimerDel.BindUFunction(this, FName("RestoreMoveSpeed"), MyInt, MyFloat);
+	TimerDel.BindUFunction(this, FName("RestoreMoveSpeed"));
+	//Calling RestoreMoveSpeed after "time" seconds without looping
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, time, false);
+}
+
+void AEnemy::RestoreMoveSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+	Particles->Deactivate();
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+//#include "TimerManager.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -23,12 +24,15 @@ public:
 
 	void GetDamaged(float damage);
 
+	void GetSlowed(float slow, float time);
+
 	bool iAmDestroyed;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystemComponent* Particles;
 
+	float walkSpeed;
 	float maxHealth;
 	float gold;
 	float health;
@@ -41,5 +45,12 @@ protected:
 	class AEnemy_AIController* ai;
 
 	class ATower_GameMode * GM;
+
+private:
+	//FTimerDelegate TimerDel;
+	//FTimerHandle TimerHandle;
+
+	UFUNCTION()
+	void RestoreMoveSpeed();
 
 };

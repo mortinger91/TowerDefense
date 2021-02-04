@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-
+// #pragma optimize("", off)
 
 #include "Game_HUD.h"
 #include "Tower_GameMode.h"
@@ -44,7 +44,9 @@ void AGame_HUD::BeginPlay()
 
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellButton")))->OnClicked.AddDynamic(this, &AGame_HUD::SellAction);
 
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnClicked.AddDynamic(this, &AGame_HUD::SpawnTowerCannonAction);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnPressed.AddDynamic(this, &AGame_HUD::SpawnTowerCannonAction);
+	
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerIce")))->OnPressed.AddDynamic(this, &AGame_HUD::SpawnTowerIceAction);
 
 }
 
@@ -134,4 +136,10 @@ void AGame_HUD::SellAction()
 void AGame_HUD::SpawnTowerCannonAction()
 {
 	GM->SpawnTower("Cannon");
+}
+
+void AGame_HUD::SpawnTowerIceAction()
+{
+	
+	GM->SpawnTower("Ice");
 }

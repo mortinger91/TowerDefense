@@ -1,6 +1,5 @@
 // Unreal Engine 4 Tower Defense
-#pragma optimize("", off)
-
+// #pragma optimize("", off)
 
 #include "Tower.h"
 #include "Cooldown.h"

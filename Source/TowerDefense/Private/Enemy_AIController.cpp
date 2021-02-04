@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-#pragma optimize("", off)
+// #pragma optimize("", off)
 
 #include "Enemy_AIController.h"
 #include "Runtime/Engine/Classes/Engine/TargetPoint.h"

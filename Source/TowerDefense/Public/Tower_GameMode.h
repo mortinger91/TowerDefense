@@ -77,6 +77,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Tower Types Blueprint")
 	TSubclassOf<class ACannonTower> CannonTowerClass;
 
+	UPROPERTY(EditAnywhere, Category = "Tower Types Blueprint")
+	TSubclassOf<class AIceTower> IceTowerClass;
+
 	void ShowUnusedTowerBases(bool toHide);
 	
 };

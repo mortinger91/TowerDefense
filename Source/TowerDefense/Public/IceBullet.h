@@ -4,19 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Bullet.generated.h"
+#include "IceBullet.generated.h"
 
 UCLASS()
-class TOWERDEFENSE_API ABullet : public AActor
+class TOWERDEFENSE_API AIceBullet : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABullet();
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	AIceBullet();
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	class UProjectileMovementComponent* BulletMovement;
@@ -24,16 +21,19 @@ public:
 	UFUNCTION() 
 	void OnBulletHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
-	//void DealDamage(class AEnemy* enemy);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UStaticMeshComponent* BulletMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystem* particlesExplosion;
+
+	class AIceTower* tower;
 
 };

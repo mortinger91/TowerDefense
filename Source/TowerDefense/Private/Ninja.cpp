@@ -1,9 +1,11 @@
 // Unreal Engine 4 Tower Defense
+// #pragma optimize("", off)
 
 #include "Ninja.h"
 #include "GameplayStats.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/World.h"
 
 ANinja::ANinja() : Super()
 {
@@ -11,7 +13,8 @@ ANinja::ANinja() : Super()
 	HealthWidgetComponent->SetDrawSize(FVector2D(60.f, 15.f));
 
 	// STATS
-	GetCharacterMovement()->MaxWalkSpeed = Ninja::walkSpeed;
+	walkSpeed = Ninja::walkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 	maxHealth = Ninja::baseHealth;
 	gold = Ninja::gold;
 }

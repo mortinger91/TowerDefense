@@ -22,11 +22,16 @@ public:
 
 	void SpawnEnemy(FString enemyType);
 
-protected:
+private:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "EnemySpawn")
 	TSubclassOf<class ANinja> NinjaClass;
+
+	bool toWait;
+
+	UFUNCTION()
+	void StartSpawning();
 
 };

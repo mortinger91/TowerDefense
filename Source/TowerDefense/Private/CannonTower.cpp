@@ -1,10 +1,13 @@
 // Unreal Engine 4 Tower Defense
+// #pragma optimize("", off)
 
 #include "CannonTower.h"
 #include "GameplayStats.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Bullet.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/World.h"
 
 ACannonTower::ACannonTower()
 {

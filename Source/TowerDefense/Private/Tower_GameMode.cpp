@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-#pragma optimize("", off)
+// #pragma optimize("", off)
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"
@@ -14,6 +14,8 @@
 #include "Engine/Engine.h"
 #include "CannonTower.h"
 #include "TowerBase.h"
+#include "IceTower.h"
+
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
@@ -66,6 +68,8 @@ void ATower_GameMode::BeginPlay()
 	MyTimeline->RegisterComponent();
 
 	ShowUnusedTowerBases(true);
+
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 }
 
 // Called every frame
@@ -74,8 +78,6 @@ void ATower_GameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (MyTimeline != nullptr) MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
-
-
 }
 
 void ATower_GameMode::Remove1Health()
@@ -190,6 +192,12 @@ void ATower_GameMode::SellSelectedTower()
 // called from Game_HUD "SpawnTower***Action" when clicking tower button on Game_UI
 void ATower_GameMode::SpawnTower(FString towerType)
 {
+	if (dragMode)
+	{
+		return;
+	}
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
 
@@ -210,9 +218,18 @@ void ATower_GameMode::SpawnTower(FString towerType)
 			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Cannon tower")));
 		}
 	}
-	else if (towerType == "Else")
+	else if (towerType == "Ice")
 	{
-		// ...
+		if (GoldAvailable(Ice::goldToBuild))
+		{
+			spawnedTower = GetWorld()->SpawnActor<AIceTower>(IceTowerClass, SpawnTransform, SpawnParams);
+			dragMode = true;
+			ShowUnusedTowerBases(false);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Ice tower")));
+		}
 	}
 }
 

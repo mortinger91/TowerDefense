@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-
+// #pragma optimize("", off)
 
 #include "Target.h"
 #include "Engine/World.h"

@@ -1,7 +1,8 @@
 // Unreal Engine 4 Tower Defense
-
+// #pragma optimize("", off)
 
 #include "TowerBase.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 ATowerBase::ATowerBase()

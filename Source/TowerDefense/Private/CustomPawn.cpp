@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-
+// #pragma optimize("", off)
 
 #include "CustomPawn.h"
 #include "Bullet.h"

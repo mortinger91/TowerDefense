@@ -50,4 +50,7 @@ private:
 
 	UFUNCTION()
 	void SpawnTowerCannonAction();
+
+	UFUNCTION()
+	void SpawnTowerIceAction();
 };
