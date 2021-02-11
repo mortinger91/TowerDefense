@@ -28,8 +28,12 @@ public:
 
 	void HideTowerTooltip();
 
+	void SetWaveText();
+
 private:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void DrawHUD() override;
 
@@ -39,8 +43,18 @@ private:
 
 	class ATower_GameMode* GM;
 
+	bool isPaused;
+	class UPaperSprite* playSprite;
+	class UPaperSprite* pauseSprite;
+
 	UFUNCTION()
 	void QuitGameAction();
+
+	UFUNCTION()
+	void PauseGameAction();
+
+	UFUNCTION()
+	void ForwardGameAction();
 
 	UFUNCTION()
 	void LevelUpAction();
@@ -53,4 +67,5 @@ private:
 
 	UFUNCTION()
 	void SpawnTowerIceAction();
+
 };

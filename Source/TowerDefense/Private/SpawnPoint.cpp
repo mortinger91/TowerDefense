@@ -7,6 +7,8 @@
 #include "GameplayStats.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Tower_GameMode.h"
+#include "TimerManager.h"
 
 // Sets default values
 ASpawnPoint::ASpawnPoint()
@@ -30,17 +32,27 @@ void ASpawnPoint::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In SpawnPoint: NinjaClass not found!"))
 	}
 
+	GM = Cast<ATower_GameMode>(GetWorld()->GetAuthGameMode());
+	if (GM == nullptr)
+	{
+		UE_LOG(LogActor, Warning, TEXT("In SpawnPoint: Game Mode not found!"))
+	}
+}
+
+void ASpawnPoint::StopSpawning(float stopTime)
+{
+	toWait = true;
 	FTimerDelegate TimerDel;
 	FTimerHandle TimerHandle;
 
 	TimerDel.BindUFunction(this, FName("StartSpawning"));
 	//Calling RestoreMoveSpeed after "time" seconds without looping
-	GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 5.f, false);
-
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, stopTime, false);
 }
 
 void ASpawnPoint::StartSpawning()
 {
+	GM->IncrementWave();
 	toWait = false;
 }
 
@@ -75,6 +87,7 @@ void ASpawnPoint::SpawnEnemy(FString enemyType)
 	{
 		GetWorld()->SpawnActor<ANinja>(NinjaClass, EnemySpawnTransform, SpawnParams);
 	}
+	//else if (enemyType == "...")
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Spawned an enemy!")));
 }

@@ -72,6 +72,11 @@ void AEnemy::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In Enemy: AEnemy_AIController not found!"))
 	}
 
+	//healthMultiplier += 1.f + int32(GetWorld()->GetTimeSeconds() / 30) * 0.5f;
+	maxHealth *= GM->healthMultiplier;
+	health = maxHealth;
+	UE_LOG(LogActor, Warning, TEXT("Spawned Enemy %s with health: %f at time: %f"), *this->GetName(), maxHealth, GetWorld()->GetTimeSeconds())
+
 	ai->GoToRandomEndPoint();
 }
 

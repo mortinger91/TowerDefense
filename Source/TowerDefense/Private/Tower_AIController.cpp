@@ -55,21 +55,26 @@ void ATower_AIController::OnPossess(APawn* MyPawn)
 	}
 }
 
-bool ATower_AIController::IsValid(UObject* Obj)
+bool ATower_AIController::IsValid(AEnemy* enemy)
 {
-  if(!Obj)
-  {
-     return false;
-  }
-  if(!Obj->IsValidLowLevel()) 
-  {
-    return false;
-  }
-  if(Obj->IsPendingKill()) 
-  {
-     return false;
-  }
-  return true;
+	if (enemy->iAmDestroyed)
+	{
+		return false;
+	}
+	// same as (enemy == nullptr)
+	if(!enemy)
+	{
+		return false;
+	}
+	if(!enemy->IsValidLowLevel()) 
+	{
+		return false;
+	}
+	if(enemy->IsPendingKill()) 
+	{
+		return false;
+	}
+	return true;
 }
 
 // every frame the tower is checking the cooldown
@@ -85,7 +90,7 @@ void ATower_AIController::Tick(float DeltaTime)
 		int32 i = 0;
 		while (i < DetectedEnemies.Num())
 		{
-			if (DetectedEnemies[i]->iAmDestroyed || !IsValid(DetectedEnemies[i]))
+			if (!IsValid(DetectedEnemies[i]))
 			{
 				DetectedEnemies.RemoveAt(i);
 			}

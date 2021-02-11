@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-// #pragma optimize("", off)
+ #pragma optimize("", off)
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"
@@ -15,7 +15,7 @@
 #include "CannonTower.h"
 #include "TowerBase.h"
 #include "IceTower.h"
-
+#include "SpawnPoint.h"
 
 ATower_GameMode::ATower_GameMode() : Super()
 {
@@ -31,6 +31,10 @@ ATower_GameMode::ATower_GameMode() : Super()
 	dragMode = false;
 	selectedTower = nullptr;
 	MyTimeline = NewObject<UTimelineComponent>(this, FName("Health_Animation"));
+
+	healthMultiplier = 0.5f;
+	waveCount = 0;
+	normalSpeed = true;
 }
 
 void ATower_GameMode::BeginPlay()
@@ -44,17 +48,18 @@ void ATower_GameMode::BeginPlay()
 	GS = Cast<ATower_GameState>(GetWorld()->GetGameState());
 	if (GS == nullptr)
 	{
-		UE_LOG(LogActor, Warning, TEXT("Game State not found!"))
+		UE_LOG(LogActor, Warning, TEXT("In Tower_GameMode: Game State not found!"))
 	}
+
 	if (HealthCurve == nullptr)
     {
-		UE_LOG(LogActor, Warning, TEXT("HealthCurve not found!"))
+		UE_LOG(LogActor, Warning, TEXT("In Tower_GameMode: HealthCurve not found!"))
 	}
 
 	HudWidgetPlayer = Cast<AGame_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (HudWidgetPlayer == nullptr)
 	{
-		UE_LOG(LogActor, Warning, TEXT("HUD Widget not found!"))
+		UE_LOG(LogActor, Warning, TEXT("In Tower_GameMode: HUD Widget not found!"))
 	}
 
 	// setting health at the start of the game
@@ -70,6 +75,18 @@ void ATower_GameMode::BeginPlay()
 	ShowUnusedTowerBases(true);
 
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), FoundActors);
+	if (FoundActors.Num() == 1)
+	{
+		spawnPoint = Cast<ASpawnPoint>(FoundActors[0]);
+	}
+	else
+	{
+		UE_LOG(LogActor, Warning, TEXT("In Tower_GameMode: SpawnPoint not found!"))
+	}
+	spawnPoint->StopSpawning(5.f);
 }
 
 // Called every frame
@@ -78,6 +95,7 @@ void ATower_GameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (MyTimeline != nullptr) MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+
 }
 
 void ATower_GameMode::Remove1Health()
@@ -176,6 +194,25 @@ void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 	}
 }
 
+void ATower_GameMode::PauseGame()
+{
+	GS->isPaused = !GS->isPaused;
+	GetWorld()->GetFirstPlayerController()->SetPause(GS->isPaused);
+}
+
+void ATower_GameMode::ToggleForward()
+{
+	if (normalSpeed)
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 2.f);
+	}
+	else
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	}
+	normalSpeed = !normalSpeed;
+}
+
 void ATower_GameMode::LevelUpSelectedTower()
 {
 	selectedTower->LevelUp();
@@ -192,44 +229,48 @@ void ATower_GameMode::SellSelectedTower()
 // called from Game_HUD "SpawnTower***Action" when clicking tower button on Game_UI
 void ATower_GameMode::SpawnTower(FString towerType)
 {
-	if (dragMode)
+	if (!GS->isPaused)
 	{
-		return;
-	}
-	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		if (dragMode)
+		{
+			return;
+		}
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 
-	FTransform SpawnTransform;
-	SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
+		FTransform SpawnTransform;
+		SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.bNoFail = true;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.bNoFail = true;
 
-	if (towerType == "Cannon")
-	{
-		if (GoldAvailable(Cannon::goldToBuild))
+		if (towerType == "Cannon")
 		{
-			spawnedTower = GetWorld()->SpawnActor<ACannonTower>(CannonTowerClass, SpawnTransform, SpawnParams);
-			dragMode = true;
-			ShowUnusedTowerBases(false);
+			if (GoldAvailable(Cannon::goldToBuild))
+			{
+				spawnedTower = GetWorld()->SpawnActor<ACannonTower>(CannonTowerClass, SpawnTransform, SpawnParams);
+				dragMode = true;
+				ShowUnusedTowerBases(false);
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Cannon tower")));
+			}
 		}
-		else
+		else if (towerType == "Ice")
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Cannon tower")));
+			if (GoldAvailable(Ice::goldToBuild))
+			{
+				spawnedTower = GetWorld()->SpawnActor<AIceTower>(IceTowerClass, SpawnTransform, SpawnParams);
+				dragMode = true;
+				ShowUnusedTowerBases(false);
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Ice tower")));
+			}
 		}
-	}
-	else if (towerType == "Ice")
-	{
-		if (GoldAvailable(Ice::goldToBuild))
-		{
-			spawnedTower = GetWorld()->SpawnActor<AIceTower>(IceTowerClass, SpawnTransform, SpawnParams);
-			dragMode = true;
-			ShowUnusedTowerBases(false);
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Not enough gold to spawn Ice tower")));
-		}
+		//else if (towerType == "...")
 	}
 }
 
@@ -255,6 +296,34 @@ void ATower_GameMode::FinalizeTowerSpawn()
 	spawnedTower = nullptr;
 }
 
+void ATower_GameMode::IncrementWave()
+{
+	waveCount++;
+	HudWidgetPlayer->SetWaveText();
+
+	//// ogni 30 secondi il moltiplicatore aumenta di 0.5
+	healthMultiplier += 0.5f;
+
+	FTimerDelegate TimerDel;
+	FTimerHandle TimerHandle;
+
+	TimerDel.BindUFunction(this, FName("StopBetweenWaves"));
+	//Calling RestoreMoveSpeed after "time" seconds without looping
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 30.f, false);
+}
+
+int32 ATower_GameMode::GetWave()
+{
+	return waveCount;
+}
+
+void ATower_GameMode::StopBetweenWaves()
+{
+	spawnPoint->StopSpawning(10.f);
+	// add text to ui indicating the 10 sec break between a wave and another?
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Waiting 10 seconds before wave %d"), waveCount+1));
+}
+
 void ATower_GameMode::GoToMainMenu()
 {
 	UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Tower_Defense/Levels/StartMenuLevel")));
@@ -272,3 +341,4 @@ void ATower_GameMode::ShowUnusedTowerBases(bool toHide)
 		}
 	}
 }
+

@@ -34,5 +34,5 @@ private:
 
 	bool isActive;
 
-	bool IsValid(UObject* Obj);
+	bool IsValid(class AEnemy* enemy);
 };

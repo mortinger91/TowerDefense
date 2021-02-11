@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
-// #pragma optimize("", off)
+ #pragma optimize("", off)
 
 #include "Game_HUD.h"
 #include "Tower_GameMode.h"
@@ -11,11 +11,17 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Tower.h"
+#include "PaperSprite.h"
 
 AGame_HUD::AGame_HUD()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 0.5f;
+
 	static ConstructorHelpers::FClassFinder<UGame_UserWidget> HealthBarObj(TEXT("/Game/Tower_Defense/UI/Game_UI"));
 	HUDWidgetClass = HealthBarObj.Class;
+
+	isPaused = false;
 }
 
 void AGame_HUD::BeginPlay()
@@ -38,7 +44,14 @@ void AGame_HUD::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In Game_HUD: Game Mode not found!"))
 	}
 
+	playSprite = Cast<UPaperSprite>(StaticLoadObject(UPaperSprite::StaticClass(), NULL, TEXT("/Game/Tower_Defense/UI/Materials/play_Sprite")));
+	pauseSprite = Cast<UPaperSprite>(StaticLoadObject(UPaperSprite::StaticClass(), NULL, TEXT("/Game/Tower_Defense/UI/Materials/pause_Sprite")));
+
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("QuitGame_Button")))->OnClicked.AddDynamic(this, &AGame_HUD::QuitGameAction);
+
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->OnClicked.AddDynamic(this, &AGame_HUD::PauseGameAction);
+
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Forward_Button")))->OnClicked.AddDynamic(this, &AGame_HUD::ForwardGameAction);
 
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeButton")))->OnClicked.AddDynamic(this, &AGame_HUD::LevelUpAction);
 
@@ -47,6 +60,28 @@ void AGame_HUD::BeginPlay()
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerCannon")))->OnPressed.AddDynamic(this, &AGame_HUD::SpawnTowerCannonAction);
 	
 	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Button_TowerIce")))->OnPressed.AddDynamic(this, &AGame_HUD::SpawnTowerIceAction);
+
+}
+
+void AGame_HUD::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FString mins = FString::FromInt(int32(GetWorld()->GetTimeSeconds() / 60));
+	//if (FString::Len(mins) < 10)
+	if (mins.Len() == 1)
+	{
+		mins = "0" + mins;
+	}
+	FString secs = FString::FromInt(int32(GetWorld()->GetTimeSeconds()) % 60);
+	//if (FString::Len(secs) < 10)
+	if (secs.Len() == 1)
+	{
+		secs = "0" + secs;
+	}
+	FText timeText = FText::FromString(mins + FString(TEXT(":")) + secs);
+
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Time_Text")))->SetText(timeText);
 
 }
 
@@ -118,9 +153,41 @@ void AGame_HUD::HideTowerTooltip()
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellGold")))->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void AGame_HUD::SetWaveText()
+{
+	FText Wave = FText::FromString(FString(TEXT("Wave: ")) + FString::FromInt(GM->GetWave()));
+	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Wave_Text")))->SetText(Wave);
+}
+
 void AGame_HUD::QuitGameAction()
 {
 	GM->ChangeGamePlayState(EGamePlayState::EGameOver);
+}
+
+void AGame_HUD::PauseGameAction()
+{
+	FSlateBrush newImage;
+	
+	if(!isPaused)
+	{
+		newImage.SetResourceObject(playSprite);
+	}
+	else
+	{
+		newImage.SetResourceObject(pauseSprite);
+	}
+
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->WidgetStyle.SetNormal(newImage);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->WidgetStyle.SetHovered(newImage);
+	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->WidgetStyle.SetPressed(newImage);
+
+	isPaused = !isPaused;
+	GM->PauseGame();
+}
+
+void AGame_HUD::ForwardGameAction()
+{
+	GM->ToggleForward();
 }
 
 void AGame_HUD::LevelUpAction()

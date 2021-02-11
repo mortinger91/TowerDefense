@@ -9,7 +9,8 @@
 ATower_GameState::ATower_GameState()
 {
 	Gold = Game::startingGold;
-	HealthPercentage = 1.f; 
+	HealthPercentage = 1.f;
+	isPaused = false;
 }
 
 void ATower_GameState::BeginPlay()

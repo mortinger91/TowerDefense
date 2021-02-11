@@ -22,13 +22,6 @@ ANinja::ANinja() : Super()
 void ANinja::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ogni 30 secondi il moltiplicatore aumenta di 0.5
-	float healthMultiplier = 1.f + int32(GetWorld()->GetRealTimeSeconds() / 30) * 0.5f;
-
-	maxHealth *= healthMultiplier;
-	UE_LOG(LogActor, Warning, TEXT("Spawned Enemy with health: %f at time: %f"), maxHealth, GetWorld()->GetRealTimeSeconds())
-	health = maxHealth;
 }
 
 void ANinja::Tick(float DeltaTime)

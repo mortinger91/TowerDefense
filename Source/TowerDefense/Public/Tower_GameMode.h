@@ -46,6 +46,8 @@ public:
 	bool GoldAvailable(int32 GoldToCheck);
 	// Handle any function calls that rely upon changing the playing state of our game
 	void ChangeGamePlayState(EGamePlayState NewState);
+	void PauseGame();
+	void ToggleForward();
 
 	// SELECTING TOWERS
 	class ATower * selectedTower;
@@ -59,10 +61,20 @@ public:
 	void SpawnTower(FString towerType);
 	void FinalizeTowerSpawn(); 
 
+	// SPAWNING ENEMIES
+	float healthMultiplier;
+	void IncrementWave();
+	int32 GetWave();
+
 private:
 	virtual void BeginPlay() override;
 
 	virtual void Tick (float DeltaTime) override;
+
+	int32 waveCount;
+	class ASpawnPoint* spawnPoint;
+	UFUNCTION()
+	void StopBetweenWaves();
 
 	class ATower_GameState* GS;
 	
@@ -81,5 +93,6 @@ private:
 	TSubclassOf<class AIceTower> IceTowerClass;
 
 	void ShowUnusedTowerBases(bool toHide);
-	
+
+	bool normalSpeed;
 };

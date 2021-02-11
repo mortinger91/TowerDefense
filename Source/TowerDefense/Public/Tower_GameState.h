@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Stats")
 	FText GetGoldText();
 
+	bool isPaused;
+
 private:
 	class ATower_GameMode* GM;
+
 };

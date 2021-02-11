@@ -15,7 +15,7 @@ class TOWERDEFENSE_API UCooldown : public UActorComponent
 
 public:	
 	// Sets default values for this component's properties
-	//UCooldown();
+	UCooldown();
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
