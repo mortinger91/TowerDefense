@@ -127,6 +127,9 @@ void AGame_HUD::ShowTowerTooltip()
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_UpgradeGold")))->SetText(UpgradeGold);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_SellGold")))->SetText(SellGold);
 
+	//UWidgetAnimation* anim = GameUIWidget->GetAnimationByName(FName("Tooltip_Show"));
+	//GameUIWidget->PlayAnimation(anim);
+
 	Cast<UImage>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Background")))->SetVisibility(ESlateVisibility::Visible);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetVisibility(ESlateVisibility::Visible); 
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetVisibility(ESlateVisibility::Visible);
@@ -144,6 +147,9 @@ void AGame_HUD::ShowTowerTooltip()
 
 void AGame_HUD::HideTowerTooltip()
 {
+	//UWidgetAnimation* anim = GameUIWidget->GetAnimationByName(FName("Tooltip_Fade"));
+	//GameUIWidget->PlayAnimation(anim);
+
 	Cast<UImage>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Background")))->SetVisibility(ESlateVisibility::Hidden);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Type")))->SetVisibility(ESlateVisibility::Hidden);
 	Cast<UTextBlock>(GameUIWidget->GetWidgetFromName(FName("Tooltip_Level")))->SetVisibility(ESlateVisibility::Hidden);

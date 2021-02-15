@@ -9,6 +9,7 @@
 #include "Engine/Engine.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TowerBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATower::ATower()
@@ -84,6 +85,7 @@ int32 ATower::GetLevel()
 
 void ATower::LevelUp()
 {
+	bool playUpgradeParticles = false;
 	switch (level)
 	{
 		case 1:
@@ -92,6 +94,7 @@ void ATower::LevelUp()
 			{
 				level = 2;
 				GM->UpdateGold(-goldToUpgrade1);
+				playUpgradeParticles = true;
 			}
 			else
 			{
@@ -105,6 +108,7 @@ void ATower::LevelUp()
 			{
 				level = 3;
 				GM->UpdateGold(-goldToUpgrade2);
+				playUpgradeParticles = true;
 			}
 			else
 			{
@@ -112,6 +116,10 @@ void ATower::LevelUp()
 			}
 		}
 		break;
+	}
+	if (playUpgradeParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), upgradeParticles, GetTransform(), true, EPSCPoolMethod::None, true);
 	}
 }
 
@@ -176,6 +184,7 @@ void ATower::Activate()
 {
 	towerPosition = GetActorLocation();
 	Cast<ATower_AIController>(GetController())->ActivateAI();
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), spawnParticles, GetTransform(), true, EPSCPoolMethod::None, true);
 }
 
 void ATower::GetActorEyesViewPoint(FVector & Location, FRotator & Rotation) const

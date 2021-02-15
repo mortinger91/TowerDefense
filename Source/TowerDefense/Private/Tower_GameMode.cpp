@@ -235,6 +235,15 @@ void ATower_GameMode::SpawnTower(FString towerType)
 		{
 			return;
 		}
+
+		selectedTower = nullptr;
+		HudWidgetPlayer->HideTowerTooltip();
+
+		// FInputModeGameAndUI cause flickering on mobile while holding touch down in the same spot
+		// FInputModeGameOnly causes the mouse to not be locked in the viewport on windows
+		FInputModeGameAndUI data;
+		data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+		//GetWorld()->GetFirstPlayerController()->SetInputMode(data);
 		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 
 		FTransform SpawnTransform;
@@ -278,10 +287,9 @@ void ATower_GameMode::FinalizeTowerSpawn()
 {
 	// check tower position
 	// if not ok, destroy tower
+	ShowUnusedTowerBases(true);
 	if (selectedBase != nullptr && !selectedBase->used)
 	{
-		//selectedBase->SetActorHiddenInGame(true);
-		ShowUnusedTowerBases(true);
 		selectedBase->used = true;
 		UpdateGold(-spawnedTower->GetGoldToBuild());
 		spawnedTower->Activate();

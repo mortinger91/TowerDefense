@@ -50,6 +50,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Static Mesh Component")
 	UStaticMeshComponent* TowerMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Particles")
+	class UParticleSystem* spawnParticles;
+
+	UPROPERTY(EditAnywhere, Category = "Particles")
+	class UParticleSystem* upgradeParticles;
+
+	UPROPERTY(EditAnywhere, Category = "Particles")
+	class UParticleSystem* sellParticles;
+
 	void SetCooldown(float cooldown);
 
 	FString towerType; // il tipo della torre

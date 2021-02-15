@@ -34,16 +34,20 @@ private:
 
 	void LookUp(float Amount);
 
-	void ClickAction();
-
+	void ClickAction(); 
 	void ReleaseAction();
 
+	//void RightClickAction(); 
+	//void RightReleaseAction();
+	
 	void TouchClickAction();
-
 	void TouchReleaseAction();
 	
 	//UPROPERTY(EditAnywhere, Category = "Stats")
 	//class UUserWidget * CursorWidgetClass;
 	
 	class ATower_GameMode* GM;
+
+	bool leftMouseIsClicked;
+	//bool rightMouseIsClicked;
 };

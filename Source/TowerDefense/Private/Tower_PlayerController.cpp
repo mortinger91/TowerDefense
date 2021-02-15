@@ -17,6 +17,8 @@ ATower_PlayerController::ATower_PlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	leftMouseIsClicked = false;
+	//rightMouseIsClicked = false;
 }
 
 void ATower_PlayerController::BeginPlay()
@@ -46,6 +48,12 @@ void ATower_PlayerController::BeginPlay()
 void ATower_PlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// DEBUG MOUSE POSITION
+		FVector mouseLocationD;
+		FVector mouseDirectionD;
+		DeprojectMousePositionToWorld(mouseLocationD, mouseDirectionD);
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("mouse position: x: %f, y: %f, z: %f"), mouseLocationD.X, mouseLocationD.Y, mouseLocationD.Z ));
 
 	if (GM->dragMode)
 	{
@@ -79,13 +87,15 @@ void ATower_PlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("LeftMouseClick", IE_Pressed, this, &ATower_PlayerController::ClickAction);
 	InputComponent->BindAction("LeftMouseClick", IE_Released, this, &ATower_PlayerController::ReleaseAction);
+	//InputComponent->BindAction("RightMouseClick", IE_Pressed, this, &ATower_PlayerController::RightClickAction);
+	//InputComponent->BindAction("RightMouseClick", IE_Released, this, &ATower_PlayerController::RightReleaseAction);
 	InputComponent->BindAction("Touch1", IE_Pressed, this, &ATower_PlayerController::TouchClickAction);
 	InputComponent->BindAction("Touch1", IE_Released, this, &ATower_PlayerController::TouchReleaseAction);
 
 	InputComponent->BindAxis("MoveForward", this, &ATower_PlayerController::MoveForward); 
 	InputComponent->BindAxis("MoveRight", this, &ATower_PlayerController::MoveRight);
-	//InputComponent->BindAxis("Turn", this, &ATower_PlayerController::Turn);
-	//InputComponent->BindAxis("LookUp", this, &ATower_PlayerController::LookUp);
+	InputComponent->BindAxis("Turn", this, &ATower_PlayerController::Turn);
+	InputComponent->BindAxis("LookUp", this, &ATower_PlayerController::LookUp);
 }
 
 void ATower_PlayerController::MoveForward(float Amount)
@@ -100,12 +110,20 @@ void ATower_PlayerController::MoveRight(float Amount)
 
 void ATower_PlayerController::Turn(float Amount)
 {
-	Cast<ACustomPawn>(GetPawn())->Turn(Amount);
+	//if (leftMouseIsClicked && !GM->dragMode)
+	if (!GM->dragMode)
+	{
+		Cast<ACustomPawn>(GetPawn())->Turn(Amount/2);
+	}
 }
 
 void ATower_PlayerController::LookUp(float Amount)
 {
-	Cast<ACustomPawn>(GetPawn())->LookUp(Amount);
+	//if (leftMouseIsClicked && !GM->dragMode)
+	if (!GM->dragMode)
+	{
+		Cast<ACustomPawn>(GetPawn())->LookUp(Amount/2);
+	}
 }
 
 void ATower_PlayerController::ClickAction()
@@ -116,11 +134,54 @@ void ATower_PlayerController::ClickAction()
 		//FVector mouseLocation;
 		//FVector mouseDirection;
 		//DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("mouse position: x: %f, y: %f, z: %f"), mouseLocation.X, mouseLocation.Y, mouseLocation.Z ));
 		//FHitResult OutHit;
 		//FVector Start = mouseLocation;
 		//FVector End = mouseLocation + mouseDirection*10000;
 		//DrawDebugLine(GetWorld(), Start, End, FColor::Green, true, 2.f, false, 4.f);
 
+	if (!GM->dragMode)
+	{
+		FHitResult Result;
+		GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Camera), true, Result);
+		if(ATower * tower = Cast<ATower>(Result.Actor))
+		{
+			GM->selectedTower = tower;
+			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Tower Actor: %s"), *GM->selectedTower->GetName()));
+			GM->HudWidgetPlayer->ShowTowerTooltip();
+		} else
+		{
+			GM->selectedTower = nullptr;
+			GM->HudWidgetPlayer->HideTowerTooltip();
+			leftMouseIsClicked = true;
+		}
+	}
+}
+
+void ATower_PlayerController::ReleaseAction()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Mouse Released click action")));
+	leftMouseIsClicked = false;
+	if (GM->dragMode)
+	{
+		GM->FinalizeTowerSpawn();
+	}
+}
+
+//void ATower_PlayerController::RightClickAction()
+//{
+//	//rightMouseIsClicked = true;
+//}
+//
+//void ATower_PlayerController::RightReleaseAction()
+//{
+//	//rightMouseIsClicked = false;
+//}
+
+void ATower_PlayerController::TouchClickAction()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Touch click action")));
+	//ClickAction();
 	FHitResult Result;
 	GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Camera), true, Result);
 	if(ATower * tower = Cast<ATower>(Result.Actor))
@@ -132,28 +193,12 @@ void ATower_PlayerController::ClickAction()
 	{
 		GM->selectedTower = nullptr;
 		GM->HudWidgetPlayer->HideTowerTooltip();
+		//leftMouseIsClicked = true;
 	}
-}
-
-void ATower_PlayerController::ReleaseAction()
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Mouse Released click action")));
-
-	if (GM->dragMode)
-	{
-		GM->FinalizeTowerSpawn();
-		SetInputMode(FInputModeGameAndUI());
-	}
-}
-
-void ATower_PlayerController::TouchClickAction()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Touch click action")));
-	ClickAction();
 }
 
 void ATower_PlayerController::TouchReleaseAction()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Touch Released click action")));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Touch Released click action")));
 	ReleaseAction();
 }

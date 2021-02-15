@@ -27,4 +27,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Static Mesh Component")
 	UStaticMeshComponent* TowerBaseMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Particles")
+	class UParticleSystemComponent* Particles;
 };

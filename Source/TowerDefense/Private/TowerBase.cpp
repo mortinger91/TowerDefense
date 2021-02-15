@@ -3,6 +3,7 @@
 
 #include "TowerBase.h"
 #include "Components/StaticMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 ATowerBase::ATowerBase()
@@ -13,6 +14,10 @@ ATowerBase::ATowerBase()
 	TowerBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("TowerBaseMesh");
 	SetRootComponent(TowerBaseMesh);
 
+	Particles = CreateDefaultSubobject<UParticleSystemComponent>("Particles");
+	FAttachmentTransformRules rules(EAttachmentRule::KeepRelative, false);
+	Particles->AttachToComponent(RootComponent, rules);
+
 	used = false;
 }
 
@@ -21,6 +26,7 @@ void ATowerBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//Particles->Deactivate();
 }
 
 // Called every frame
