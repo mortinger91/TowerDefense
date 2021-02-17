@@ -45,7 +45,7 @@ public:
 	void UpdateGold(float gold);
 	bool GoldAvailable(int32 GoldToCheck);
 	// Handle any function calls that rely upon changing the playing state of our game
-	void ChangeGamePlayState(EGamePlayState NewState);
+	void ChangeGamePlayState(EGamePlayState NewState, bool playAnimation = true);
 	void PauseGame();
 	void ToggleForward();
 
@@ -65,6 +65,8 @@ public:
 	float healthMultiplier;
 	void IncrementWave();
 	int32 GetWave();
+
+	bool mobile;
 
 private:
 	virtual void BeginPlay() override;
@@ -95,4 +97,6 @@ private:
 	void ShowUnusedTowerBases(bool toHide);
 
 	bool normalSpeed;
+
+	FString platform;
 };

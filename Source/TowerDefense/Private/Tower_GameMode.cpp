@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
- #pragma optimize("", off)
+ //#pragma optimize("", off)
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"
@@ -35,6 +35,8 @@ ATower_GameMode::ATower_GameMode() : Super()
 	healthMultiplier = 0.5f;
 	waveCount = 0;
 	normalSpeed = true;
+
+	mobile = false;
 }
 
 void ATower_GameMode::BeginPlay()
@@ -87,6 +89,22 @@ void ATower_GameMode::BeginPlay()
 		UE_LOG(LogActor, Warning, TEXT("In Tower_GameMode: SpawnPoint not found!"))
 	}
 	spawnPoint->StopSpawning(5.f);
+
+	platform = UGameplayStatics::GetPlatformName();
+	if (platform != "Windows" && platform != "Android")
+	{
+		UE_LOG(LogActor, Warning, TEXT("Platform: %s, not recognized"), *platform)
+	}
+	else if (platform == "Windows")
+	{
+		UE_LOG(LogActor, Warning, TEXT("Platform recognized: Windows"), *platform)
+		mobile = false;
+	}
+	else if (platform == "Android")
+	{
+		UE_LOG(LogActor, Warning, TEXT("Platform recognized: Android"), *platform)
+		mobile = true;
+	}
 }
 
 // Called every frame
@@ -156,7 +174,7 @@ bool ATower_GameMode::GoldAvailable(int32 GoldToCheck)
 	}
 }
 
-void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
+void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState, bool playAnimation)
 {
 	CurrentState = NewState;
 	switch (CurrentState)
@@ -173,15 +191,22 @@ void ATower_GameMode::ChangeGamePlayState(EGamePlayState NewState)
 			// restart the level
 			UE_LOG(LogActor, Warning, TEXT("WE FUCKING LOST!"))
 
-			HudWidgetPlayer->PlayGameOverAnimation();
+			if (playAnimation)
+			{
+				HudWidgetPlayer->PlayGameOverAnimation();
 
-			FTimerDelegate TimerDel;
-			FTimerHandle TimerHandle;
+				FTimerDelegate TimerDel;
+				FTimerHandle TimerHandle;
  
-			//Binding the function to the timeline
-			TimerDel.BindUFunction(this, FName("GoToMainMenu"));
-			//Calling GoToMainMenu after 3 seconds without looping
-			GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 3.f, false);
+				//Binding the function to the timeline
+				TimerDel.BindUFunction(this, FName("GoToMainMenu"));
+				//Calling GoToMainMenu after 3 seconds without looping
+				GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 3.f, false);
+			}
+			else
+			{
+				GoToMainMenu();
+			}
 		}
 		break;
 		// Unknown/default state
@@ -243,8 +268,14 @@ void ATower_GameMode::SpawnTower(FString towerType)
 		// FInputModeGameOnly causes the mouse to not be locked in the viewport on windows
 		FInputModeGameAndUI data;
 		data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
-		//GetWorld()->GetFirstPlayerController()->SetInputMode(data);
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		if (!mobile)
+		{
+			GetWorld()->GetFirstPlayerController()->SetInputMode(data);
+		}
+		else
+		{
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		}
 
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(FVector(0.f,0.f,0.f));
@@ -349,4 +380,3 @@ void ATower_GameMode::ShowUnusedTowerBases(bool toHide)
 		}
 	}
 }
-

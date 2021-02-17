@@ -37,11 +37,16 @@ private:
 	void ClickAction(); 
 	void ReleaseAction();
 
-	//void RightClickAction(); 
-	//void RightReleaseAction();
+	// mobile touch controls
+	FVector2D previousTouchLocation1;
+	FVector2D newTouchLocation1;
 	
-	void TouchClickAction();
-	void TouchReleaseAction();
+	FVector2D touchLocation2;
+	float previousDistance;
+	float newDistance;
+
+	void OnTouchBegin(ETouchIndex::Type touchType, FVector touchLocation);
+	void TouchReleaseAction(ETouchIndex::Type touchType, FVector touchLocation);
 	
 	//UPROPERTY(EditAnywhere, Category = "Stats")
 	//class UUserWidget * CursorWidgetClass;
@@ -49,5 +54,6 @@ private:
 	class ATower_GameMode* GM;
 
 	bool leftMouseIsClicked;
-	//bool rightMouseIsClicked;
+
+	inline float DistanceOfTwoPoints(const FVector2D& p1, const FVector2D& p2);
 };

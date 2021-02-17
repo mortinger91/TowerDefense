@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
- #pragma optimize("", off)
+ //#pragma optimize("", off)
 
 #include "Game_HUD.h"
 #include "Tower_GameMode.h"
@@ -167,7 +167,7 @@ void AGame_HUD::SetWaveText()
 
 void AGame_HUD::QuitGameAction()
 {
-	GM->ChangeGamePlayState(EGamePlayState::EGameOver);
+	GM->ChangeGamePlayState(EGamePlayState::EGameOver, false);
 }
 
 void AGame_HUD::PauseGameAction()
