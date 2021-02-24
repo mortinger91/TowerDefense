@@ -12,6 +12,7 @@
 #include "Components/Image.h"
 #include "Tower.h"
 #include "PaperSprite.h"
+#include "Engine/Engine.h"
 
 AGame_HUD::AGame_HUD()
 {
@@ -183,9 +184,17 @@ void AGame_HUD::PauseGameAction()
 		newImage.SetResourceObject(pauseSprite);
 	}
 
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->WidgetStyle.SetNormal(newImage);
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->WidgetStyle.SetHovered(newImage);
-	Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button")))->WidgetStyle.SetPressed(newImage);
+	if (UButton* pauseButton = Cast<UButton>(GameUIWidget->GetWidgetFromName(FName("Pause_Button"))))
+	{
+		pauseButton->WidgetStyle.SetNormal(newImage);
+		pauseButton->WidgetStyle.SetHovered(newImage);
+		pauseButton->WidgetStyle.SetPressed(newImage);
+	}
+	else
+	{
+		UE_LOG(LogActor, Error, TEXT("Failed to change pause button UPaperSprite!"))
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Failed to change pause button UPaperSprite!")));
+	}
 
 	isPaused = !isPaused;
 	GM->PauseGame();

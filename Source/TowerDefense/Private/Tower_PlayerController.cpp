@@ -13,6 +13,7 @@
 #include "DrawDebugHelpers.h"
 #include "TowerBase.h"
 #include "GenericPlatform/GenericPlatformMath.h"
+//#include "Enemy.h"
 
 ATower_PlayerController::ATower_PlayerController()
 {
@@ -27,7 +28,9 @@ void ATower_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// engine custom settings
 	ConsoleCommand(FString("t.MaxFPS = 60"), false);
+	ConsoleCommand(FString("r.Shadow.RadiusThreshold 0.01"), false);
 
 	FInputModeGameAndUI data;
 	data.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
@@ -56,6 +59,7 @@ void ATower_PlayerController::Tick(float DeltaTime)
 		//DeprojectMousePositionToWorld(mouseLocationD, mouseDirectionD);
 		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("mouse position: x: %f, y: %f, z: %f"), mouseLocationD.X, mouseLocationD.Y, mouseLocationD.Z ));
 
+	// spawning tower on desktop and mobile
 	if (GM->dragMode)
 	{
 		FVector mouseLocation;
@@ -67,26 +71,41 @@ void ATower_PlayerController::Tick(float DeltaTime)
 		FVector End = mouseLocation + mouseDirection*10000;
 		if (GM->mobile)
 		{
-			End += FVector(0.f, -1500.f, 0.f);
+			End += FVector(0.f, -1200.f, 0.f);
 		}
 
 		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("mouse position: x: %f, y: %f, z: %f"), End.X, End.Y, End.Z ));
 
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(GM->spawnedTower);
-		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic, CollisionParams);
-		if (OutHit.GetActor() != nullptr && OutHit.GetActor()->IsA(ATowerBase::StaticClass()))
+		//FCollisionQueryParams CollisionParams;
+		//CollisionParams.AddIgnoredActor(GM->spawnedTower);
+		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic);//, CollisionParams);
+
+		//if (OutHit.GetActor()->IsA(ATowerBase::StaticClass()) && !Cast<ATowerBase>(OutHit.GetActor())->used)
+		bool toMove = true;
+		//if (OutHit.GetActor() != nullptr && OutHit.GetActor()->IsA(ATowerBase::StaticClass()))
+		if (ATowerBase* base = Cast<ATowerBase>(OutHit.GetActor()))
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Tower onto base: %s"), *OutHit.GetActor()->GetName()));
-			GM->spawnedTower->SetActorLocation(OutHit.GetActor()->GetActorLocation());
-			GM->selectedBase = Cast<ATowerBase>(OutHit.GetActor());
+			if (!base->used)
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Tower onto base: %s"), *OutHit.GetActor()->GetName()));
+				//GM->spawnedTower->SetActorLocation(OutHit.GetActor()->GetActorLocation());
+				GM->spawnedTower->SetActorLocation(base->GetActorLocation());
+				//GM->selectedBase = Cast<ATowerBase>(OutHit.GetActor()); 
+				GM->selectedBase = base;
+				toMove = false;
+			}
 		}
-		else
+		//else if ( OutHit.GetActor()->IsA(AEnemy::StaticClass()) )
+		//{
+		//	toMove = false;
+		//}
+		if (toMove)
 		{
 			GM->spawnedTower->SetActorLocation(OutHit.Location);
 			GM->selectedBase = nullptr;
 		}
 	}
+	// for mobile movement
 	else if (GM->mobile)
 	{
 		bool isCurrentlyPressed1;
@@ -101,7 +120,7 @@ void ATower_PlayerController::Tick(float DeltaTime)
 
 				newDistance = DistanceOfTwoPoints(newTouchLocation1, touchLocation2);
 				float zoomAmount = previousDistance - newDistance;
-				FVector deltaOffsetZoom(0.f, 0.f, zoomAmount);
+				FVector deltaOffsetZoom(0.f, 0.f, zoomAmount * 2);
 				Cast<ACustomPawn>(GetPawn())->AddActorWorldOffset(deltaOffsetZoom);
 
 				previousDistance = newDistance;
@@ -185,7 +204,7 @@ void ATower_PlayerController::ClickAction()
 	{
 		FHitResult Result;
 		GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Camera), true, Result);
-		if(ATower * tower = Cast<ATower>(Result.Actor))
+		if(ATower * tower = Cast<ATower>(Result.GetActor()))
 		{
 			GM->selectedTower = tower;
 			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Tower Actor: %s"), *GM->selectedTower->GetName()));

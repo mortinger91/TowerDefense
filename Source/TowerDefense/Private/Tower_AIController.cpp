@@ -127,12 +127,12 @@ void ATower_AIController::OnPawnDetected(const TArray<AActor*> &DetectedPawnsNow
 				if (!(DetectedEnemies.Find(Cast<AEnemy>(DetectedPawnsNow[i]), index)))
 				{
 					DetectedEnemies.Add(Cast<AEnemy>(DetectedPawnsNow[i]));
-					UE_LOG(LogActor, Warning, TEXT("Enemy %s Added!"), *DetectedPawnsNow[i]->GetName())
+					//UE_LOG(LogActor, Warning, TEXT("Enemy %s Added!"), *DetectedPawnsNow[i]->GetName())
 				}
 				else
 				{
 					DetectedEnemies.RemoveAt(index);
-					UE_LOG(LogActor, Warning, TEXT("Enemy %s Removed!"), *DetectedPawnsNow[i]->GetName())
+					//UE_LOG(LogActor, Warning, TEXT("Enemy %s Removed!"), *DetectedPawnsNow[i]->GetName())
 				}
 			}
 		}

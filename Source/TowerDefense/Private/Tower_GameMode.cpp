@@ -1,5 +1,5 @@
 // Unreal Engine 4 Tower Defense
- //#pragma optimize("", off)
+//#pragma optimize("", off)
 
 #include "Tower_GameMode.h"
 #include "Tower_GameState.h"

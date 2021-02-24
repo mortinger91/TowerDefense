@@ -20,6 +20,7 @@ ATower::ATower()
 	// mesh component
 	TowerMesh = CreateDefaultSubobject<UStaticMeshComponent>("TowerMesh");
 	SetRootComponent(TowerMesh);
+	TowerMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
 	// cooldown component
 	cooldownShot = CreateDefaultSubobject<UCooldown>("cooldown");

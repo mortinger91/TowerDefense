@@ -37,11 +37,6 @@ void ACannonTower::BeginPlay()
 	{
 		UE_LOG(LogActor, Warning, TEXT("In CannonTower: BulletClass not found!"))
 	}
-
-	if (!(sockets.Num() > 0))
-	{
-		UE_LOG(LogActor, Warning, TEXT("No Tower Sockets found for %s!"), *this->GetName())
-	}
 }
 
 void ACannonTower::Activate()
@@ -51,6 +46,11 @@ void ACannonTower::Activate()
 	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket1")) + FVector(-shiftSock, 0.f, 0.f) );
 	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket2")) + FVector(0.f, -shiftSock, 0.f) );
 	sockets.Add(TowerMesh->GetSocketLocation(FName("Socket3")) + FVector(0.f, shiftSock, 0.f) );
+
+	if (!(sockets.Num() > 0))
+	{
+		UE_LOG(LogActor, Warning, TEXT("No Tower Sockets found for %s!"), *this->GetName())
+	}
 
 	Super::Activate();
 }
