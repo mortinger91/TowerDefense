@@ -24,7 +24,7 @@ public:
 	float maxCooldown;
 
 	UFUNCTION()
-	bool IsNotCooldown();
+	bool IsNotCooldown() const;
 
 	void StartCooldown();
 

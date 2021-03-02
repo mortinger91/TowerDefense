@@ -43,7 +43,7 @@ public:
 	void SetHealth();
 	void Remove1Health();
 	void UpdateGold(float gold);
-	bool GoldAvailable(int32 GoldToCheck);
+	bool GetAvailableGold(int32 GoldToCheck) const;
 	// Handle any function calls that rely upon changing the playing state of our game
 	void ChangeGamePlayState(EGamePlayState NewState, bool playAnimation = true);
 	void PauseGame();
@@ -64,7 +64,7 @@ public:
 	// SPAWNING ENEMIES
 	float healthMultiplier;
 	void IncrementWave();
-	int32 GetWave();
+	int32 GetWave() const;
 
 	bool mobile;
 

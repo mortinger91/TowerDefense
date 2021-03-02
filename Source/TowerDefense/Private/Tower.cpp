@@ -56,7 +56,7 @@ void ATower::Tick(float DeltaTime)
 
 }
 
-float ATower::GetDamage()
+float ATower::GetDamage() const
 {
 	switch (level)
 	{
@@ -79,7 +79,7 @@ float ATower::GetDamage()
 	return 0;
 }
 
-int32 ATower::GetLevel()
+int32 ATower::GetLevel() const
 {
 	return level;
 }
@@ -91,7 +91,7 @@ void ATower::LevelUp()
 	{
 		case 1:
 		{
-			if (GM->GoldAvailable(goldToUpgrade1))
+			if (GM->GetAvailableGold(goldToUpgrade1))
 			{
 				level = 2;
 				GM->UpdateGold(-goldToUpgrade1);
@@ -105,7 +105,7 @@ void ATower::LevelUp()
 		break;
 		case 2:
 		{
-			if (GM->GoldAvailable(goldToUpgrade2))
+			if (GM->GetAvailableGold(goldToUpgrade2))
 			{
 				level = 3;
 				GM->UpdateGold(-goldToUpgrade2);
@@ -130,7 +130,7 @@ void ATower::Sell()
 	Destroy();
 }
 
-int32 ATower::GetGoldToUpgrade()
+int32 ATower::GetGoldToUpgrade() const
 {
 	switch (level)
 	{
@@ -148,7 +148,7 @@ int32 ATower::GetGoldToUpgrade()
 	return 0;
 }
 
-int32 ATower::GetGoldToSell()
+int32 ATower::GetGoldToSell() const
 {
 	switch (level)
 	{
@@ -171,12 +171,12 @@ int32 ATower::GetGoldToSell()
 	return 0;
 }
 
-int32 ATower::GetGoldToBuild()
+int32 ATower::GetGoldToBuild() const
 {
 	return goldToBuild;
 }
 
-FString ATower::GetTowerType()
+FString ATower::GetTowerType() const
 {
 	return towerType;
 }
@@ -200,7 +200,7 @@ void ATower::SetCooldown(float cooldown)
 	cooldownShot->maxCooldown = cooldown;
 }
 
-float ATower::GetAISightRadius()
+float ATower::GetAISightRadius() const
 {
 	return AISightRadius;
 }
@@ -210,7 +210,7 @@ void ATower::SetTowerBase(ATowerBase* towerBaseToSet)
 	towerBase = towerBaseToSet;
 }
 
-ATowerBase* ATower::GetTowerBase()
+ATowerBase* ATower::GetTowerBase() const
 {
 	return towerBase;
 }

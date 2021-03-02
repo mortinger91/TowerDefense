@@ -32,7 +32,7 @@ private:
 
     UFUNCTION()
 	//class AEndPoint * GetRandomEndPoint();
-	ATargetPoint * GetRandomEndPoint();
+	ATargetPoint * GetRandomEndPoint() const;
 	
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 

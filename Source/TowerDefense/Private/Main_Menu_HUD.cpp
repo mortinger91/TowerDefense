@@ -47,7 +47,7 @@ void AMain_Menu_HUD::DrawHUD()
 
 }
 
-UUserWidget * AMain_Menu_HUD::GetHUDWidget()
+UUserWidget * AMain_Menu_HUD::GetHUDWidget() const
 {
 	return CurrentWidget;
 }

@@ -47,7 +47,7 @@ void UGame_UserWidget::FillAnimationsMap()
 	}
 }
 
-UWidgetAnimation* UGame_UserWidget::GetAnimationByName(FName AnimationName)
+UWidgetAnimation* UGame_UserWidget::GetAnimationByName(FName AnimationName) const
 {
 	UWidgetAnimation* const* WidgetAnim = AnimationsMap.Find(AnimationName);
 	if (WidgetAnim)

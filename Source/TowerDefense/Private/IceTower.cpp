@@ -73,7 +73,7 @@ void AIceTower::Shoot(const AActor* enemyToShoot)
 	GetWorld()->SpawnActor<AIceBullet>(BulletClass, BulletSpawnTransform, BulletSpawnParams);
 }
 
-float AIceTower::GetSlowTime()
+float AIceTower::GetSlowTime() const
 {
 	switch (level)
 	{

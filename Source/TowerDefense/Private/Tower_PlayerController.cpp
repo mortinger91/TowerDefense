@@ -257,7 +257,7 @@ void ATower_PlayerController::TouchReleaseAction(ETouchIndex::Type touchType, FV
 	}
 }
 
-inline float ATower_PlayerController::DistanceOfTwoPoints(const FVector2D& p1, const FVector2D& p2)
+inline float ATower_PlayerController::DistanceOfTwoPoints(const FVector2D& p1, const FVector2D& p2) const
 {
 	return FGenericPlatformMath::Sqrt( FGenericPlatformMath::Pow((p1.X - p2.X),2.f) + FGenericPlatformMath::Pow((p1.Y - p2.Y),2.f) );
 }

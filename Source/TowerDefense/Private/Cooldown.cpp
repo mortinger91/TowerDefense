@@ -29,7 +29,7 @@ void UCooldown::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 }
 
-bool UCooldown::IsNotCooldown()
+bool UCooldown::IsNotCooldown() const
 {
 	if ((GetWorld()->GetTimeSeconds() - actualCooldown) >= maxCooldown)
 	{

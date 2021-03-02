@@ -19,23 +19,23 @@ public:
 
 	virtual void Shoot(const AActor* enemyToShoot) PURE_VIRTUAL(ATower::Shoot, return;);
 
-	float GetDamage(); //dipende dal livello
+	float GetDamage() const; //dipende dal livello
 
-	int32 GetLevel(); // restituisce il livello
+	int32 GetLevel() const; // restituisce il livello
 	 
 	void LevelUp(); // aumenta di livello se possibile
 	
 	void Sell(); // aumenta di livello se possibile
 
-	int32 GetGoldToUpgrade(); // restituisce i gold necessari al prossimo upgrade
+	int32 GetGoldToUpgrade() const; // restituisce i gold necessari al prossimo upgrade
 
-	int32 GetGoldToSell();
+	int32 GetGoldToSell() const;
 
-	int32 GetGoldToBuild();
+	int32 GetGoldToBuild() const;
 
-	FString GetTowerType();
+	FString GetTowerType() const;
 
-	float GetAISightRadius();
+	float GetAISightRadius() const;
 
 	virtual void Activate();
 
@@ -44,7 +44,7 @@ public:
 	FVector towerPosition;
 
 	void SetTowerBase(class ATowerBase* towerBaseToSet);
-	class ATowerBase* GetTowerBase();
+	class ATowerBase* GetTowerBase() const;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Static Mesh Component")

@@ -18,7 +18,7 @@ public:
 
 	void Shoot(const AActor* enemyToShoot) override;
 
-	float GetSlowTime();
+	float GetSlowTime() const;
 
 private:
 	virtual void BeginPlay() override;

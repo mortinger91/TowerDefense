@@ -34,5 +34,5 @@ private:
 
 	bool isActive;
 
-	bool IsValid(class AEnemy* enemy);
+	bool IsValid(class AEnemy* enemy) const;
 };

@@ -162,7 +162,7 @@ void ATower_GameMode::UpdateGold(float gold)
 	HudWidgetPlayer->UpdateGoldText(GS->Gold);
 }
 
-bool ATower_GameMode::GoldAvailable(int32 GoldToCheck)
+bool ATower_GameMode::GetAvailableGold(int32 GoldToCheck) const
 {
 	if (GS->GetGold() >= GoldToCheck)
 	{
@@ -286,7 +286,7 @@ void ATower_GameMode::SpawnTower(FString towerType)
 
 		if (towerType == "Cannon")
 		{
-			if (GoldAvailable(Cannon::goldToBuild))
+			if (GetAvailableGold(Cannon::goldToBuild))
 			{
 				spawnedTower = GetWorld()->SpawnActor<ACannonTower>(CannonTowerClass, SpawnTransform, SpawnParams);
 				dragMode = true;
@@ -299,7 +299,7 @@ void ATower_GameMode::SpawnTower(FString towerType)
 		}
 		else if (towerType == "Ice")
 		{
-			if (GoldAvailable(Ice::goldToBuild))
+			if (GetAvailableGold(Ice::goldToBuild))
 			{
 				spawnedTower = GetWorld()->SpawnActor<AIceTower>(IceTowerClass, SpawnTransform, SpawnParams);
 				dragMode = true;
@@ -351,7 +351,7 @@ void ATower_GameMode::IncrementWave()
 	GetWorldTimerManager().SetTimer(TimerHandle, TimerDel, 30.f, false);
 }
 
-int32 ATower_GameMode::GetWave()
+int32 ATower_GameMode::GetWave() const
 {
 	return waveCount;
 }

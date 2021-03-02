@@ -55,5 +55,5 @@ private:
 
 	bool leftMouseIsClicked;
 
-	inline float DistanceOfTwoPoints(const FVector2D& p1, const FVector2D& p2);
+	inline float DistanceOfTwoPoints(const FVector2D& p1, const FVector2D& p2) const;
 };

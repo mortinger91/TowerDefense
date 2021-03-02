@@ -55,7 +55,7 @@ void ATower_AIController::OnPossess(APawn* MyPawn)
 	}
 }
 
-bool ATower_AIController::IsValid(AEnemy* enemy)
+bool ATower_AIController::IsValid(AEnemy* enemy) const
 {
 	if (enemy->iAmDestroyed)
 	{

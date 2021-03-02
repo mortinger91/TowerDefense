@@ -17,6 +17,8 @@ class TOWERDEFENSE_API ATower_GameState : public AGameStateBase
 public:
 	ATower_GameState();
 
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float Health;
 
@@ -26,19 +28,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gold")
 	int32 Gold;
 
-	virtual void BeginPlay() override;
-
+	// function that is still called in GAME_UI blueprint, port it to C++ adjusting floating values on each tick according to GM->UCurveFloat* HealthCurve
 	UFUNCTION(BlueprintPure, Category = "Stats")
-	float GetHealthPercentage();
+	float GetHealthPercentage() const;
+	FText GetHealthText() const;
 
-	UFUNCTION(BlueprintPure, Category = "Stats")
-	FText GetHealthText();
-
-	UFUNCTION(BlueprintPure, Category = "Stats")
-	int32 GetGold();
-
-	UFUNCTION(BlueprintPure, Category = "Stats")
-	FText GetGoldText();
+	int32 GetGold() const;
+	FText GetGoldText() const;
 
 	bool isPaused;
 
