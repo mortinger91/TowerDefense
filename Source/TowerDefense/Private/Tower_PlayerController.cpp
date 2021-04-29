@@ -76,9 +76,9 @@ void ATower_PlayerController::Tick(float DeltaTime)
 
 		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("mouse position: x: %f, y: %f, z: %f"), End.X, End.Y, End.Z ));
 
-		//FCollisionQueryParams CollisionParams;
-		//CollisionParams.AddIgnoredActor(GM->spawnedTower);
-		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic);//, CollisionParams);
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(GM->spawnedTower);
+		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic, CollisionParams);
 
 		//if (OutHit.GetActor()->IsA(ATowerBase::StaticClass()) && !Cast<ATowerBase>(OutHit.GetActor())->used)
 		bool toMove = true;
@@ -202,12 +202,30 @@ void ATower_PlayerController::ClickAction()
 
 	if (!GM->dragMode)
 	{
-		FHitResult Result;
-		GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Camera), true, Result);
-		if(ATower * tower = Cast<ATower>(Result.GetActor()))
+		//FHitResult Result;
+		//GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Camera), true, Result);
+		
+		FVector mouseLocation;
+		FVector mouseDirection;
+		DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+
+		FHitResult OutHit;
+		FVector Start = mouseLocation;
+		FVector End = mouseLocation + mouseDirection*10000;
+		//if (GM->mobile)
+		//{
+		//	End += FVector(0.f, -1200.f, 0.f);
+		//}
+
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("mouse position: x: %f, y: %f, z: %f"), End.X, End.Y, End.Z ));
+
+		GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_WorldStatic);//, CollisionParams);
+
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Actor: %s"), *OutHit.GetActor()->GetName()));
+
+		if(ATower* tower = Cast<ATower>(OutHit.GetActor()))
 		{
 			GM->selectedTower = tower;
-			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Clicked Tower Actor: %s"), *GM->selectedTower->GetName()));
 			GM->HudWidgetPlayer->ShowTowerTooltip();
 		} 
 		else

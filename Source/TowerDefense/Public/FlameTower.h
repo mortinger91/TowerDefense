@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Tower.h"
-#include "CannonTower.generated.h"
+#include "FlameTower.generated.h"
 
 UCLASS()
-class TOWERDEFENSE_API ACannonTower : public ATower
+class TOWERDEFENSE_API AFlameTower : public ATower
 {
 	GENERATED_BODY()
 
 public:
-	ACannonTower();
+	AFlameTower();
 
 	void Activate() override;
 
@@ -21,14 +21,9 @@ public:
 private:
 	void BeginPlay() override;
 
-	// array of sockets, points from where to shoot (cannons)
-	TArray<FVector> sockets;
-
-	float shiftSock;
+	FVector socket;
 
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystem* particlesShooting;
 
-	UPROPERTY(EditAnywhere, Category = "Shooting")
-	TSubclassOf<class ABullet> BulletClass;
 };

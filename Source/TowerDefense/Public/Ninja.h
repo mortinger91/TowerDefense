@@ -14,7 +14,7 @@ class TOWERDEFENSE_API ANinja : public AEnemy
 public:
 	ANinja();
 
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 };

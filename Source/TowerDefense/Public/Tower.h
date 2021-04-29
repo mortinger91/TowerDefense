@@ -47,8 +47,12 @@ public:
 	class ATowerBase* GetTowerBase() const;
 
 protected:
+	//UPROPERTY(Category=Character, VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	UPROPERTY(EditAnywhere, Category = "Static Mesh Component")
 	UStaticMeshComponent* TowerMesh;
+
+	//UPROPERTY(EditAnywhere, Category="Capsule component")
+	//class UCapsuleComponent* CapsuleComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Particles")
 	class UParticleSystem* spawnParticles;

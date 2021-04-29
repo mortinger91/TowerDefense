@@ -8,6 +8,9 @@
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/GameUserSettings.h"
+
+//TODO: fix DPI scaling, only solution atm is to package and disable DPI optimization performed by application. Also packaged windows starts in fullscreen
 
 AMain_Menu_HUD::AMain_Menu_HUD()
 {
@@ -73,14 +76,23 @@ void AMain_Menu_HUD::OpenOptions()
 
 void AMain_Menu_HUD::SetRes1080()
 {
+	//GEngine->GameUserSettings->SetScreenResolution(FIntPoint(1920,1080));
+	UE_LOG(LogActor, Warning, TEXT("Console executing: setres 1920x1080"))
+	GetWorld()->GetFirstPlayerController()->ConsoleCommand("setres 1920x1080");
 }
 
 void AMain_Menu_HUD::SetRes720()
 {
+	//GEngine->GameUserSettings->SetScreenResolution(FIntPoint(1280,720));
+	UE_LOG(LogActor, Warning, TEXT("Console executing: setres 1280x720"))
+	GetWorld()->GetFirstPlayerController()->ConsoleCommand("setres 1280x720");
 }
 
 void AMain_Menu_HUD::SetRes480()
 {
+	//GEngine->GameUserSettings->SetScreenResolution(FIntPoint(640,480));
+	UE_LOG(LogActor, Warning, TEXT("Console executing: setres 640x480"))
+	GetWorld()->GetFirstPlayerController()->ConsoleCommand("setres 640x480");
 }
 
 void AMain_Menu_HUD::ReturnToMainMenu()

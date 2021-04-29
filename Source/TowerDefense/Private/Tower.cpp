@@ -1,5 +1,4 @@
 // Unreal Engine 4 Tower Defense
-// #pragma optimize("", off)
 
 #include "Tower.h"
 #include "Cooldown.h"
@@ -10,6 +9,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TowerBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ATower::ATower()
@@ -20,7 +20,11 @@ ATower::ATower()
 	// mesh component
 	TowerMesh = CreateDefaultSubobject<UStaticMeshComponent>("TowerMesh");
 	SetRootComponent(TowerMesh);
-	TowerMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	//TowerMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+	//CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("capsule component");
+	//SetRootComponent(CapsuleComponent);
+
 
 	// cooldown component
 	cooldownShot = CreateDefaultSubobject<UCooldown>("cooldown");

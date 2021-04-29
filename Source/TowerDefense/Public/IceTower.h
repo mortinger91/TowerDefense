@@ -1,4 +1,4 @@
-
+// Unreal Engine 4 Tower Defense
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
 	float GetSlowTime() const;
 
 private:
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
 	FVector socket;
 
